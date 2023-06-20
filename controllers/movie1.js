@@ -236,7 +236,7 @@ exports.getSingleMovie = async (req, res) => {
         
         
       } = movie;
-      console.log(videos.results.length)
+     
       if (videos.results.length === 0) {
         trailer = null
         trailer2 = null
