@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken')
 const User = require('../models/user')
 const EmailVerificationToken = require('../models/email_verification');
 const { isValidObjectId } = require('mongoose');
-const { generateOPT, generateMailTransporter } = require('../utils/mail');
+const { generateOPT} = require('../utils/mail');
 const { sendError, generateRandomByte } = require('../utils/helper');
 const PasswordResetToken = require('../models/password_reset');
 const { sendEmail } = require('../utils/mail');
@@ -31,8 +31,16 @@ exports.create = async (req, res) => {
 
   // send that otp to our user
   const htmlContent = `
-    <p>You verification OTP</p>
-    <h1>${OTP}</h1>
+    <h1>Welcome, ${name}!</h1>
+    <p>Thanks for trying Woke Advisory. We’re thrilled to have you on board. To get the most out of Woke Advisory, verify your email:</p>
+    <p>Your verification code:</p>
+    <h1 className="text-red">${OTP}</h1>
+    <p>For reference, here's your login information:</p>
+    <h3>Email: ${email}</h3>
+    <p>If you have any questions, feel free to email our customer success team. (We're lightning quick at replying.) We also offer live chat during business hours.</p>
+    <p>Thanks!</p>
+    <p>Team Woke Advisory</p>
+    <h3>mailto:info@wokeadvisory.com</h3>
   `
   await sendEmail(newUser.email, newUser.name, 'Email Verification', htmlContent)
 
@@ -45,55 +53,6 @@ exports.create = async (req, res) => {
     },
   });
 };
-
-// exports.verifyEmail = async (req, res) => {
-//   const { userId, OTP } = req.body
-
-//   if (!isValidObjectId(userId)) return sendError(res, "Invalid user!")
-
-//   const user = await User.findById(userId)
-//   if (!user) return sendError(res, "user not found!", 404)
-
-//   if (user.isVerified) return sendError(res, "user is already verified!")
-
-//   const token = await EmailVerificationToken.findOne({ owner: userId })
-//   if (!token) return sendError(res, 'token not found!')
-
-//   const isMatched = await token.compareToken(OTP)
-//   if (!isMatched) return sendError(res, 'Please submit a valid OTP!')
-
-//   user.isVerified = true;
-//   await user.save();
-
-//   await EmailVerificationToken.findByIdAndDelete(token._id);
-
-//   // var transport = generateMailTransporter();
-
-//   // transport.sendMail({
-//   //   from: 'verification@reviewapp.com',
-//   //   to: user.email,
-//   //   subject: 'Welcome Email',
-//   //   html: '<h1>Welcome to our app and thanks for choosing us.</h1>'
-//   // })
-
-//   const htmlContent = `
-//   <h1>Welcome to our app and thanks for choosing us.</h1>
-//   `
-//   await sendEmail(user.email, user.name, 'Welcome Email!', htmlContent) 
-
-
-// res.status(201).json({ user: {
-//   id: user._id,
-//   name: user.name,
-//   email: user.email,
-//   isVerified: user.isVerified
-
-// } })
-
-
-//   const jwtToken = jwt.sign({userId: user._id}, process.env.JWT_SECRET, {expiresIn: '1d'})
-//   res.json({ user: {id: user._id, name: user.name, email: user.email, token: jwtToken, isVerified: user.isVerified, role: user.role }, message: "Your email is verified." })
-// };
 
 exports.verifyEmail = async (req, res) => {
   const { userId, OTP } = req.body;
@@ -117,7 +76,15 @@ exports.verifyEmail = async (req, res) => {
   await EmailVerificationToken.findByIdAndDelete(token._id);
 
   const htmlContent = `
-  <h1>Welcome to our app and thanks for choosing us.</h1>
+  <h1>Welcome, ${user.name}!</h1>
+    <p>Thanks for trying Woke Advisory. We’re thrilled to have you on board. Your email is now verified! you can start making reviews! :</p>
+    <p>Lets Keep our Reviews family friendly, stick with just describing the situation so others are informed!</p>
+    <p>For reference, here's your login information:</p>
+    <h3>Email: ${user.email}</h3>
+    <p>If you have any questions, feel free to email our customer success team. (We're lightning quick at replying.) We also offer live chat during business hours.</p>
+    <p>Thanks!</p>
+    <p>Team Woke Advisory</p>
+    <h3>mailto:info@wokeadvisory.com</h3>
   `
   await sendEmail(user.email, user.name, 'Welcome Email!', htmlContent)
 
@@ -158,23 +125,17 @@ exports.resendEmailVerificationToken = async (req, res) => {
 
   await newEmailVerificationToken.save()
 
-  // send that otp to our user
-
-  // var transport = generateMailTransporter()
-
-  // transport.sendMail({
-  //   from: 'verification@reviewapp.com',
-  //   to: user.email,
-  //   subject: 'Email Verification',
-  //   html: `
-  //     <p>You verification OTP</p>
-  //     <h1>${OTP}</h1>
-  //   `
-  // })
-
   const htmlContent = `
-  <p>You verification OTP</p>
-      <h1>${OTP}</h1>
+  <h1>Welcome, ${user.name}!</h1>
+  <p>Thanks for trying Woke Advisory. We’re thrilled to have you on board. To get the most out of Woke Advisory, verify your email:</p>
+  <p>Your verification code:</p>
+  <h1 className="text-red">${OTP}</h1>
+  <p>For reference, here's your login information:</p>
+  <h3>Email: ${user.email}</h3>
+  <p>If you have any questions, feel free to email our customer success team. (We're lightning quick at replying.) We also offer live chat during business hours.</p>
+  <p>Thanks!</p>
+  <p>Team Woke Advisory</p>
+  <h3>mailto:info@wokeadvisory.com</h3>
 `
 await sendEmail(user.email, user.name, 'Email Verification', htmlContent) 
 
@@ -209,20 +170,18 @@ exports.forgetPassword = async (req, res) => {
 
   const resetPasswordUrl = `http://wokeadvisory.com/auth/reset-password?token=${token}&id=${user._id}`;
 
-  // const transport = generateMailTransporter();
-
-  // transport.sendMail({
-  //   from: "security@reviewapp.com",
-  //   to: user.email,
-  //   subject: "Reset Password Link",
-  //   html: `
-  //     <p>Click here to reset password</p>
-  //     <a href='${resetPasswordUrl}'>Change Password</a>
-  //   `,
-  // });
   const htmlContent = `
+  <h1>Welcome, ${user.name}!</h1>
+  <p>Thanks for trying Woke Advisory. We’re thrilled to have you on board.</p>
   <p>Click here to reset password</p>
    <a href='${resetPasswordUrl}'>Change Password</a>
+  <p>For reference, here's your login information:</p>
+  <h3>Email: ${user.email}</h3>
+  <p>If you have any questions, feel free to email our customer success team. (We're lightning quick at replying.) We also offer live chat during business hours.</p>
+  <p>Thanks!</p>
+  <p>Team Woke Advisory</p>
+  <h3>mailto:info@wokeadvisory.com</h3>
+  
 `
 await sendEmail(user.email, user.name, 'Reset Password Link', htmlContent)
 
@@ -248,19 +207,6 @@ exports.resetPassword = async (req, res) => {
   await user.save();
 
   await PasswordResetToken.findByIdAndDelete(req.resetToken._id);
-
-  // const transport = generateMailTransporter();
-
-  // transport.sendMail({
-  //   from: "security@reviewapp.com",
-  //   to: user.email,
-  //   subject: "Password Reset Successfully",
-  //   html: `
-  //     <h1>Password Reset Successfully</h1>
-  //     <p>Now you can use new password.</p>
-
-  //   `,
-  // });
 
   const htmlContent = `
   <h1>Password Reset Successfully</h1>
