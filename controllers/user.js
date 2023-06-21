@@ -77,9 +77,9 @@ exports.verifyEmail = async (req, res) => {
 
 
 res.status(201).json({ user: {
-  id: newUser._id,
-  name: newUser.name,
-  email: newUser.email,
+  id: user._id,
+  name: user.name,
+  email: user.email,
   // isVerified: newUser.isVerified
 
 } })
