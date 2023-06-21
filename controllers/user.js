@@ -27,30 +27,16 @@ exports.create = async (req, res) => {
 
   // send that otp to our user
 
-  // var transport = generateMailTransporter();
-
-  // transport.sendMail({
-  //   from: 'verification@reviewapp.com',
-  //   to: newUser.email,
-  //   subject: 'Email Verification',
-  //   html: `
-  //     <p>You verification OTP</p>
-  //     <h1>${OTP}</h1>
-  //   `
-  // })
   const htmlContent = `
     <p>You verification OTP</p>
     <h1>${OTP}</h1>
   `
   await sendEmail(newUser.email, newUser.name, 'Email Verification', htmlContent) 
 
-
   res.status(201).json({ user: {
     id: newUser._id,
     name: newUser.name,
     email: newUser.email,
-    // isVerified: newUser.isVerified
-
   } })
 };
 

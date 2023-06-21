@@ -3,6 +3,8 @@ const Movie = require("../models/movie");
 const Review = require("../models/review");
 const { sendError } = require("../utils/helper");
 const { getAverageRatings } = require("../utils/helper");
+const fetch = require('node-fetch');
+
 
 
 
@@ -124,6 +126,7 @@ exports.getReviewsByMovie = async (req, res) => {
  
     const movieAPI = await response.json();
     const movieTitle = movieAPI.title;
+
 
   // if (!isValidObjectId(movieId)) return sendError(res, "Invalid movie ID!");
   
