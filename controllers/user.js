@@ -7,88 +7,133 @@ const { sendError, generateRandomByte } = require('../utils/helper');
 const PasswordResetToken = require('../models/password_reset');
 const { sendEmail } = require('../utils/mail');
 
+
 exports.create = async (req, res) => {
-  const { name, email, password } = req.body
+  const { name, email, password } = req.body;
 
   const oldUser = await User.findOne({ email });
 
-  if (oldUser) return sendError(res, "This email is already in use!")
+  if (oldUser) return sendError(res, "This email is already in use!");
 
-  const newUser = new User({ name, email, password })
-  await newUser.save()
+  const newUser = new User({ name, email, password });
+  await newUser.save();
 
   // generate 6 digit otp
   let OTP = generateOPT();
 
   // store otp inside our db
-  const newEmailVerificationToken = new EmailVerificationToken({ owner: newUser._id, token: OTP })
+  const newEmailVerificationToken = new EmailVerificationToken({
+    owner: newUser._id,
+    token: OTP,
+  });
 
-  await newEmailVerificationToken.save()
+  await newEmailVerificationToken.save();
 
   // send that otp to our user
-
   const htmlContent = `
     <p>You verification OTP</p>
     <h1>${OTP}</h1>
   `
-  await sendEmail(newUser.email, newUser.name, 'Email Verification', htmlContent) 
+  await sendEmail(newUser.email, newUser.name, 'Email Verification', htmlContent)
 
-  res.status(201).json({ user: {
-    id: newUser._id,
-    name: newUser.name,
-    email: newUser.email,
-  } })
+
+  res.status(201).json({
+    user: {
+      id: newUser._id,
+      name: newUser.name,
+      email: newUser.email,
+    },
+  });
 };
 
+// exports.verifyEmail = async (req, res) => {
+//   const { userId, OTP } = req.body
+
+//   if (!isValidObjectId(userId)) return sendError(res, "Invalid user!")
+
+//   const user = await User.findById(userId)
+//   if (!user) return sendError(res, "user not found!", 404)
+
+//   if (user.isVerified) return sendError(res, "user is already verified!")
+
+//   const token = await EmailVerificationToken.findOne({ owner: userId })
+//   if (!token) return sendError(res, 'token not found!')
+
+//   const isMatched = await token.compareToken(OTP)
+//   if (!isMatched) return sendError(res, 'Please submit a valid OTP!')
+
+//   user.isVerified = true;
+//   await user.save();
+
+//   await EmailVerificationToken.findByIdAndDelete(token._id);
+
+//   // var transport = generateMailTransporter();
+
+//   // transport.sendMail({
+//   //   from: 'verification@reviewapp.com',
+//   //   to: user.email,
+//   //   subject: 'Welcome Email',
+//   //   html: '<h1>Welcome to our app and thanks for choosing us.</h1>'
+//   // })
+
+//   const htmlContent = `
+//   <h1>Welcome to our app and thanks for choosing us.</h1>
+//   `
+//   await sendEmail(user.email, user.name, 'Welcome Email!', htmlContent) 
+
+
+// res.status(201).json({ user: {
+//   id: user._id,
+//   name: user.name,
+//   email: user.email,
+//   isVerified: user.isVerified
+
+// } })
+
+
+//   const jwtToken = jwt.sign({userId: user._id}, process.env.JWT_SECRET, {expiresIn: '1d'})
+//   res.json({ user: {id: user._id, name: user.name, email: user.email, token: jwtToken, isVerified: user.isVerified, role: user.role }, message: "Your email is verified." })
+// };
+
 exports.verifyEmail = async (req, res) => {
-  const { userId, OTP } = req.body
+  const { userId, OTP } = req.body;
 
-  if (!isValidObjectId(userId)) return sendError(res, "Invalid user!")
+  if (!isValidObjectId(userId)) return sendError(res, "Invalid user!");
 
-  const user = await User.findById(userId)
-  if (!user) return sendError(res, "user not found!", 404)
+  const user = await User.findById(userId);
+  if (!user) return sendError(res, "user not found!", 404);
 
-  if (user.isVerified) return sendError(res, "user is already verified!")
+  if (user.isVerified) return sendError(res, "user is already verified!");
 
-  const token = await EmailVerificationToken.findOne({ owner: userId })
-  if (!token) return sendError(res, 'token not found!')
+  const token = await EmailVerificationToken.findOne({ owner: userId });
+  if (!token) return sendError(res, "token not found!");
 
-  const isMatched = await token.compareToken(OTP)
-  if (!isMatched) return sendError(res, 'Please submit a valid OTP!')
+  const isMatched = await token.compareToken(OTP);
+  if (!isMatched) return sendError(res, "Please submit a valid OTP!");
 
   user.isVerified = true;
   await user.save();
 
   await EmailVerificationToken.findByIdAndDelete(token._id);
 
-  // var transport = generateMailTransporter();
-
-  // transport.sendMail({
-  //   from: 'verification@reviewapp.com',
-  //   to: user.email,
-  //   subject: 'Welcome Email',
-  //   html: '<h1>Welcome to our app and thanks for choosing us.</h1>'
-  // })
-
   const htmlContent = `
   <h1>Welcome to our app and thanks for choosing us.</h1>
   `
-  await sendEmail(user.email, user.name, 'Welcome Email!', htmlContent) 
+  await sendEmail(user.email, user.name, 'Welcome Email!', htmlContent)
 
-
-res.status(201).json({ user: {
-  id: user._id,
-  name: user.name,
-  email: user.email,
-  isVerified: user.isVerified
-
-} })
-
-
-  const jwtToken = jwt.sign({userId: user._id}, process.env.JWT_SECRET, {expiresIn: '1d'})
-  res.json({ user: {id: user._id, name: user.name, email: user.email, token: jwtToken, isVerified: user.isVerified, role: user.role }, message: "Your email is verified." })
+  const jwtToken = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
+  res.json({
+    user: {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      token: jwtToken,
+      isVerified: user.isVerified,
+      role: user.role,
+    },
+    message: "Your email is verified.",
+  });
 };
-
 
 exports.resendEmailVerificationToken = async (req, res) => {
   const { userId } = req.body;
