@@ -237,6 +237,15 @@ exports.signIn = async (req, res) => {
 
   res.json({user: {id: _id, name, email, role, token: jwtToken, isVerified, role}})
 
- 
+}
 
+exports.userInfo = async (req, res) => {
+  const {userId} = req.params;
+
+  if (!isValidObjectId(userId)) return sendError(res, "Invalid user!");
+
+  const user = await User.findById(userId);
+  if (!user) return sendError(res, "user not found!", 404);
+
+  res.json({user: {id: user._id, name: user.name, email: user.email, isVerified: user.isVerified, role: user.role}})
 }

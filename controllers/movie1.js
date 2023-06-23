@@ -30,6 +30,7 @@ exports.getUpcomingMovies = async (req, res) => {
           reviews: { ...reviews },
         };
       };
+      
       const movies = await Promise.all(movie.results.slice(0, 6).map(mapMovies));
       res.json({ movies });
      
