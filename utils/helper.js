@@ -42,6 +42,15 @@ exports.formatActor = (actor) => {
     avatar: avatar?.url,
   };
 };
+exports.formatUser = (user) => {
+  const { name, bio, _id, avatar } = user;
+  return {
+    id: _id,
+    name,
+    bio,
+    avatar: avatar?.url,
+  };
+};
 
 exports.parseData = (req, res, next) => {
   const { trailer, cast, genres, tags, writers } = req.body;
