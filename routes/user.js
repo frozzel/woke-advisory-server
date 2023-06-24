@@ -1,7 +1,8 @@
 const express = require("express");
-const { create, verifyEmail, resendEmailVerificationToken, forgetPassword, sendResetPasswordTokenStatus, resetPassword, signIn, userInfo } = require("../controllers/user");
+const { create, verifyEmail, resendEmailVerificationToken, forgetPassword, sendResetPasswordTokenStatus, resetPassword, signIn, userInfo, updateUser } = require("../controllers/user");
 const { isValidPassResetToken } = require("../utils/user");
 const { userValidator, validate, validatePassword, signInValidator, isAuth } = require("../utils/auth");
+const { uploadImage } = require("../utils/multer");
 
 
 const router = express.Router();
@@ -20,5 +21,6 @@ router.get('/is-auth', isAuth, (req, res) => {
 })
 
 router.get("/profile/:userId", isAuth, userInfo)
+router.patch("/update/:userId", isAuth, uploadImage.single("avatar"), updateUser)
 
 module.exports = router;

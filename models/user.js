@@ -28,7 +28,20 @@ const userSchema = mongoose.Schema({
         default: 'user',
         enum: ['user', 'admin']
     },
-})
+    avatar: {
+        type: Object,
+        url: { type: String, required: false },
+        public_id: { type: String, required: true },
+        responsive: [URL],
+      },
+    bio: {
+        type: String,
+        trim: true,
+        required: false
+    },
+}, 
+{ timestamps: true }
+)
 
 userSchema.pre('save', async function(next){ // hash password before saving to database
     if(this.isModified('password')) {

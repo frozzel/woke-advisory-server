@@ -3,9 +3,11 @@ const User = require('../models/user')
 const EmailVerificationToken = require('../models/email_verification');
 const { isValidObjectId } = require('mongoose');
 const { generateOPT} = require('../utils/mail');
-const { sendError, generateRandomByte } = require('../utils/helper');
+const { sendError, generateRandomByte, uploadImageToCloud, formatUser} = require('../utils/helper');
 const PasswordResetToken = require('../models/password_reset');
 const { sendEmail } = require('../utils/mail');
+const cloudinary = require('../cloud');
+
 
 
 exports.create = async (req, res) => {
@@ -247,5 +249,40 @@ exports.userInfo = async (req, res) => {
   const user = await User.findById(userId);
   if (!user) return sendError(res, "user not found!", 404);
 
-  res.json({user: {id: user._id, name: user.name, email: user.email, isVerified: user.isVerified, role: user.role}})
+  res.json({user: {id: user._id, name: user.name, email: user.email, isVerified: user.isVerified, role: user.role, avatar: user.avatar?.url, bio: user.bio}})
 }
+
+exports.updateUser = async (req, res) => {
+  const { name, bio } = req.body;
+  const { file } = req;
+  const { userId } = req.params;
+
+  if (!isValidObjectId(userId)) return sendError(res, "User not found!");
+
+  const user = await User.findById(userId);
+  if (!user) return sendError(res, "Invalid request, record not found!");
+
+  const public_id = user.avatar?.public_id;
+
+  // remove old image if there was one!
+  if (public_id && file) {
+    const { result } = await cloudinary.uploader.destroy(public_id);
+    if (result !== "ok") {
+      return sendError(res, "Could not remove image from cloud!");
+    }
+  }
+
+  // upload new avatar if there is one!
+  if (file) {
+    const { url, public_id } = await uploadImageToCloud(file.path);
+    user.avatar = { url, public_id };
+  }
+
+  user.name = name;
+  user.bio = bio;
+  
+
+  await user.save();
+
+  res.status(201).json({actor: formatUser(user)});
+};
