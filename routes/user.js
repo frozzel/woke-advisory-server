@@ -21,6 +21,6 @@ router.get('/is-auth', isAuth, (req, res) => {
 })
 
 router.get("/profile/:userId", isAuth, userInfo)
-router.patch("/update/:userId", isAuth, uploadImage.single("avatar"), updateUser)
+router.put("/update/:userId", isAuth, uploadImage.single("avatar"), updateUser)
 
 module.exports = router;
