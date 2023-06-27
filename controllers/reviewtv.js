@@ -137,11 +137,12 @@ exports.getReviewsByMovie = async (req, res) => {
       path: "reviews",
       populate: {
         path: "owner",
-        select: "name",
+        
+        
       },
       
     })
-    .select("reviews title");
+    // .select("reviews title");
     
     if (!movie) return null;
     
@@ -155,13 +156,14 @@ exports.getReviewsByMovie = async (req, res) => {
       anti_religion,
       globalWarming,
       leftWing, _id: reviewID } = r;
-    const { name, _id: ownerId } = owner;
+    const { name, _id: ownerId, avatar } = owner;
 
     return {
       id: reviewID,
       owner: {
         id: ownerId,
         name,
+        avatar,
       },
       content,
       rating,
@@ -179,4 +181,57 @@ exports.getReviewsByMovie = async (req, res) => {
     console.log(error);
     return sendError(res, "Movie/TV id is not valid!"); 
   }
+};
+
+exports.getReviewsByUser = async (req, res) => {
+  const { userId } = req.params;
+
+  if (!isValidObjectId(userId)) return sendError(res, "Invalid User ID!");
+
+  const reviewsMovie = await ReviewTv.find({ owner: userId})
+    .populate({
+      path: "parentTv",
+      populate: {
+        path: "title",
+        select: "title",
+      },
+      
+    })
+    // .select("title");
+ 
+    const reviews = reviewsMovie.map((r) => {
+      const { owner, content, rating, CRT, parentTv,
+        LGBTQ_content,
+        trans_content,
+        anti_religion,
+        globalWarming,
+        leftWing, _id: reviewID } = r;
+      const { backdrop_path, title, id, TMDB_Id } = parentTv;
+  
+      return {
+        id: reviewID,
+        owner,
+        content,
+        rating,
+        CRT,
+        LGBTQ_content,
+        trans_content,
+        anti_religion,
+        globalWarming,
+        leftWing,
+        parentTv: {
+          id,
+          title,
+          TMDB_Id,
+          backdrop_path: "https://image.tmdb.org/t/p/original" + backdrop_path
+        },
+      };
+    });
+
+ 
+
+  
+
+  res.json({ movie: { reviews } });
+
 };
