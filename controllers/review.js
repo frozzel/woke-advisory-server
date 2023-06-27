@@ -123,7 +123,7 @@ exports.getReviewsByMovie = async (req, res) => {
   };
   try{
     const response = await fetch(url, options)
- 
+  
     const movieAPI = await response.json();
     const movieTitle = movieAPI.title;
 
@@ -135,13 +135,18 @@ exports.getReviewsByMovie = async (req, res) => {
       path: "reviews",
       populate: {
         path: "owner",
-        select: "name",
+        // select: "name",
+        // select: "avatar.url",
       },
       
     })
-    .select("reviews title");
+    // .select("reviews title ");
+    
+  
 
     if (!movie) return null;
+
+    
   
     
 
@@ -152,13 +157,15 @@ exports.getReviewsByMovie = async (req, res) => {
       anti_religion,
       globalWarming,
       leftWing, _id: reviewID } = r;
-    const { name, _id: ownerId } = owner;
+    const { name, _id: ownerId, avatar } = owner;
+    
 
     return {
       id: reviewID,
       owner: {
         id: ownerId,
         name,
+        avatar,
       },
       content,
       rating,
@@ -172,8 +179,60 @@ exports.getReviewsByMovie = async (req, res) => {
   });
   
   res.json({ movie: { reviews, title: movieTitle } })}
-   catch (error) {
+    catch (error) {
     console.log(error);
     return sendError(res, "Movie/TV id is not valid!"); 
   }
+};
+exports.getReviewsByUser = async (req, res) => {
+  const { userId } = req.params;
+
+  if (!isValidObjectId(userId)) return sendError(res, "Invalid User ID!");
+
+  const reviewsMovie = await Review.find({ owner: userId})
+    .populate({
+      path: "parentMovie",
+      populate: {
+        path: "title",
+        select: "title",
+      },
+      
+    })
+    // .select("title");
+ 
+    const reviews = reviewsMovie.map((r) => {
+      const { owner, content, rating, CRT, parentMovie,
+        LGBTQ_content,
+        trans_content,
+        anti_religion,
+        globalWarming,
+        leftWing, _id: reviewID } = r;
+      const { backdrop_path, title, id, TMDB_Id } = parentMovie;
+  
+      return {
+        id: reviewID,
+        owner,
+        content,
+        rating,
+        CRT,
+        LGBTQ_content,
+        trans_content,
+        anti_religion,
+        globalWarming,
+        leftWing,
+        parentMovie: {
+          id,
+          title,
+          TMDB_Id,
+          backdrop_path: "https://image.tmdb.org/t/p/original" + backdrop_path
+        },
+      };
+    });
+
+ 
+
+  
+
+  res.json({ movie: { reviews } });
+
 };
