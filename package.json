@@ -21,6 +21,7 @@
   "author": "Dennis Hickox",
   "license": "MIT",
   "dependencies": {
+    "@mongoosejs/double": "^0.3.0",
     "bcrypt": "^5.1.0",
     "cloudinary": "^1.36.2",
     "cors": "^2.8.5",
