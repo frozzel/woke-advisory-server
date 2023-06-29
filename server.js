@@ -5,12 +5,13 @@ const {errorHandler} = require('./utils/error')// import error handler
 require('dotenv').config()// import dotenv
 require('./config/connections')//   import database connection
 
-const schoolRouter = require('./routes/school');// import user router
+const schoolRouter = require('./routes/school');// import school router
 const userRouter = require('./routes/user');// import user router
 const actorRouter = require('./routes/actor');// import user router
 const movieRouter = require('./routes/movie');// import user router
 const reviewRouter = require("./routes/review"); // import review router
 const reviewTvRouter = require("./routes/reviewtv"); // import review router
+const newsRouter = require("./routes/news"); // import news router
 
 
 const adminRouter = require("./routes/admin"); // import admin router
@@ -33,6 +34,7 @@ app.use('/api/movie', movieRouter);// use user router
 app.use('/api/movie1', movie1Router);// use user router
 app.use("/api/review", reviewRouter); // use review router
 app.use("/api/reviewTv", reviewTvRouter); // use review router
+app.use("/api/news", newsRouter); // use news router
 
 
 
