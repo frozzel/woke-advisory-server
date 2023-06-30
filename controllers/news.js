@@ -36,3 +36,29 @@ exports.getNews = async (req, res) => {
     }
     
 }
+
+exports.getNewsMongo = async (req, res) => {
+  
+
+  const news = await News.find({})
+    .sort({ createdAt: -1 })
+
+  // const results = movies.map((movie) => ({
+  //   id: movie._id,
+  //   title: movie.title,
+  //   overview: movie.overview,
+  //   release_date: movie.release_date,
+  //   TMDB_Id: movie.TMDB_Id,
+  //   IMDB: movie.IMDB,
+  //   backdrop_path: movie.backdrop_path,
+  //   trailer: movie.trailer,
+  //   trailer2: movie.trailer2,
+  //   trailer3: movie.trailer3,
+  //   original_language: movie.original_language,
+    
+  //   genres: movie.genres,
+    
+  // }));
+
+  res.json({ news});
+};
