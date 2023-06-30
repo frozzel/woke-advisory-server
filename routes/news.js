@@ -1,9 +1,10 @@
 const express = require("express");
-const { getNews } = require("../controllers/news");
+const { getNews, getNewsMongo } = require("../controllers/news");
 
 const router = express.Router();
 
 router.get("/all", getNews);
+router.get("/relevant", getNewsMongo);
 
 
 module.exports = router;
