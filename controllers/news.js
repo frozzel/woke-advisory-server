@@ -1,5 +1,10 @@
+const { createApi }=  require('unsplash-js') ;
 const fetch = require('node-fetch');
 const News = require('../models/news');
+const Image = require('../models/image');
+
+
+
 
 exports.getNews = async (req, res) => {
     const options = {
@@ -18,15 +23,15 @@ exports.getNews = async (req, res) => {
           source: n.source.name,
           author: n.author,
           title: n.title,
-            description: n.description,
-            url: n.url,
-            urlToImage: n.urlToImage,
-            publishedAt: n.publishedAt,
-            content: n.content,
+          description: n.description,
+          url: n.url,
+          urlToImage: n.urlToImage,
+          publishedAt: n.publishedAt,
+          content: n.content,
 
         });
         await newNews.save();
-        console.log("done");
+        
       };
       const movies = await Promise.all(news.articles.map(mapNews));
       res.json({ news, movies });
@@ -43,22 +48,40 @@ exports.getNewsMongo = async (req, res) => {
   const news = await News.find({})
     .sort({ createdAt: -1 })
 
-  // const results = movies.map((movie) => ({
-  //   id: movie._id,
-  //   title: movie.title,
-  //   overview: movie.overview,
-  //   release_date: movie.release_date,
-  //   TMDB_Id: movie.TMDB_Id,
-  //   IMDB: movie.IMDB,
-  //   backdrop_path: movie.backdrop_path,
-  //   trailer: movie.trailer,
-  //   trailer2: movie.trailer2,
-  //   trailer3: movie.trailer3,
-  //   original_language: movie.original_language,
-    
-  //   genres: movie.genres,
-    
-  // }));
-
   res.json({ news});
 };
+
+exports.getImages = async (req, res) => {
+  const unsplash = createApi({
+    accessKey: process.env.UPSPLASH_KEY,
+    fetch: fetch,
+  });
+  // const { searchTerm } = req.params;
+  try {
+    const response = await unsplash.collections.getPhotos({collectionId: ["-8PkV3atF68"], perPage: 30, page: 2});
+    
+    const mapImages = async (i) => {
+  
+      const newImage = new Image({
+        unsplashId: i.id,
+        imageUrl: i.urls.raw,
+        author: i.user.name,
+        profileUrl: i.user.links.html,
+      });
+      await newImage.save();
+    };
+
+    const images = await Promise.all(response.response.results.map(mapImages));
+    res.json({ images });
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+exports.getImagesMongo = async (req, res) => {
+  const images = await Image.find({})
+  
+  oneImage = images[Math.floor(Math.random() * images.length)];
+
+  res.json({ oneImage });
+}
