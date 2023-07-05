@@ -456,7 +456,7 @@ exports.getAverageRatingsSchool = async (schoolId) => {
   return reviews;
   } else if (!schoolReview) {
     const [aggregatedResponse] = await ReviewSchool.aggregate(
-      this.averageRatingPipelineTv(schoolId)
+      this.averageRatingPipelineSchool(schoolId)
     );
     const reviews = {};
     // if(!aggregatedResponse)return null;
