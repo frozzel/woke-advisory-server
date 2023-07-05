@@ -7,7 +7,7 @@ const reviewSchoolSchema = mongoose.Schema({
     ref: "User",
     required: true,
   },
-  parentMovie: {
+  parentSchool: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Movie",
     required: true,
@@ -24,15 +24,15 @@ const reviewSchoolSchema = mongoose.Schema({
     type: Boolean,
     default: false,
   },
-  LGBTQ_content: {
+  trans_grooming: {
     type: Boolean,
     default: false,
   },
-  trans_content: {
+  trans_pronouns: {
     type: Boolean,
     default: false,
   },
-  anti_religion: {
+  trans_bathroom: {
     type: Boolean,
     default: false,
   },
@@ -40,10 +40,10 @@ const reviewSchoolSchema = mongoose.Schema({
     type: Boolean,
     default: false,
   },
-  leftWing: {
+  anti_parents_rights: {
     type: Boolean,
     default: false,
   },
 });
 
-module.exports = mongoose.model("ReviewSchools", reviewSchoolSchema);
+module.exports = mongoose.model("ReviewSchool", reviewSchoolSchema);
