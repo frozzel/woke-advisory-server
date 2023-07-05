@@ -142,7 +142,7 @@ exports.getReviewsBySchool = async (req, res) => {
       
     })
     // .select("reviews title");
-    console.log(movie)
+    
     if (!movie) return null;
     
   
