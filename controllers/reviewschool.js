@@ -2,7 +2,7 @@ const { isValidObjectId } = require("mongoose");
 const { sendError } = require("../utils/helper");
 const { getAverageRatingsSchool } = require("../utils/helper");
 const School = require("../models/school");
-const ReviewSchool = require("../models/reviewschool");
+const ReviewSchool = require("../models/reviewSchool");
 // const fetch = require('node-fetch');
 
 
