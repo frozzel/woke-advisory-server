@@ -4,6 +4,8 @@ const Review = require("../models/review");
 const Movie = require("../models/movie");
 const TV = require("../models/tv");
 const ReviewTv = require("../models/reviewtv");
+const School = require("../models/school");
+const ReviewSchool = require("../models/reviewschool");
 
 exports.sendError = (res, error, statusCode = 401) =>
   res.status(statusCode).json({ error });
@@ -113,6 +115,62 @@ exports.averageRatingPipeline = (movieId) => {
         leftWing: {
           $sum: {
             $cond: [{ $eq: ["$leftWing", true] }, 1, 0],
+          },
+        },
+      },
+    },
+  ];
+};
+exports.averageRatingPipelineSchool = (schoolId) => {
+  return [
+    {
+      $lookup: {
+        from: "ReviewSchool",
+        localField: "rating",
+        foreignField: "_id",
+        as: "avgRat",
+      },
+    },
+    {
+      $match: { parentSchool: schoolId },
+    },
+    {
+      $group: {
+        _id: null,
+        ratingAvg: {
+          $avg: "$rating",
+        },
+        reviewCount: {
+          $sum: 1,
+        },
+        CRT: {
+          $sum: {
+            $cond: [{ $eq: ["$CRT", true] }, 1, 0],
+          },
+        },
+        trans_grooming: {
+          $sum: {
+            $cond: [{ $eq: ["$trans_grooming", true] }, 1, 0],
+          },
+        },
+        trans_pronouns: {  
+          $sum: {
+            $cond: [{ $eq: ["$trans_pronouns", true] }, 1, 0],
+          },
+        },
+        trans_bathroom: {
+          $sum: {
+            $cond: [{ $eq: ["$trans_bathroom", true] }, 1, 0],
+          },
+        },
+        globalWarming: {
+          $sum: {
+            $cond: [{ $eq: ["$globalWarming", true] }, 1, 0],
+          },
+        },
+        anti_parents_rights: {
+          $sum: {
+            $cond: [{ $eq: ["$anti_parents_rights", true] }, 1, 0],
           },
         },
       },
@@ -368,6 +426,51 @@ exports.getAverageRatingsTv = async (movieId) => {
       reviews.globalWarming = globalWarming;
       reviews.leftWing = leftWing;
       
+    }
+    return reviews;
+  }
+};
+exports.getAverageRatingsSchool = async (schoolId) => {
+  const schoolReview = await School.findOne({ _id: schoolId });
+  if (schoolReview){
+
+  
+  const [aggregatedResponse] = await ReviewSchool.aggregate(
+    this.averageRatingPipelineTv(schoolReview._id)
+  );
+  const reviews = {};
+
+  if (aggregatedResponse) {
+    const { ratingAvg, reviewCount, CRT, trans_grooming, trans_pronouns, trans_bathroom, globalWarming, anti_parents_rights } = aggregatedResponse;
+    reviews.ratingAvg = parseFloat(ratingAvg).toFixed(1);
+    reviews.reviewCount = reviewCount;
+    reviews.CRT = CRT;
+    reviews.trans_grooming = trans_grooming;
+    reviews.trans_pronouns = trans_pronouns;
+    reviews.trans_bathroom =  trans_bathroom;
+    reviews.globalWarming = globalWarming;
+    reviews.anti_parents_rights = anti_parents_rights;
+
+  }
+
+  return reviews;
+  } else if (!schoolReview) {
+    const [aggregatedResponse] = await ReviewSchool.aggregate(
+      this.averageRatingPipelineTv(schoolId)
+    );
+    const reviews = {};
+    // if(!aggregatedResponse)return null;
+    if (aggregatedResponse) {
+      const { ratingAvg, reviewCount, CRT, trans_grooming, trans_pronouns, trans_bathroom, globalWarming, anti_parents_rights } = aggregatedResponse;
+      reviews.ratingAvg = parseFloat(ratingAvg).toFixed(1);
+      reviews.reviewCount = reviewCount;
+      reviews.CRT = CRT;
+      reviews.trans_grooming = trans_grooming;
+      reviews.trans_pronouns = trans_pronouns;
+      reviews.trans_bathroom =  trans_bathroom;
+      reviews.globalWarming = globalWarming;
+      reviews.anti_parents_rights = anti_parents_rights;
+  
     }
     return reviews;
   }
