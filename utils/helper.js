@@ -5,7 +5,7 @@ const Movie = require("../models/movie");
 const TV = require("../models/tv");
 const ReviewTv = require("../models/reviewtv");
 const School = require("../models/school");
-const ReviewSchool = require("../models/reviewSchool");
+const ReviewSchool = require("../models/reviewschool");
 
 exports.sendError = (res, error, statusCode = 401) =>
   res.status(statusCode).json({ error });
