@@ -46,6 +46,7 @@ exports.addReview = async (req, res) => {
     trans_bathroom,
     globalWarming,
     anti_parents_rights,
+    
   });
   
   // updating review for movie.
