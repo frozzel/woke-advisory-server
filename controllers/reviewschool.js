@@ -3,7 +3,7 @@ const { sendError } = require("../utils/helper");
 const { getAverageRatingsSchool } = require("../utils/helper");
 const School = require("../models/school");
 const ReviewSchool = require("../models/reviewschool");
-const fetch = require('node-fetch');
+// const fetch = require('node-fetch');
 
 
 
@@ -184,9 +184,9 @@ exports.getReviewsByUser = async (req, res) => {
 
   if (!isValidObjectId(userId)) return sendError(res, "Invalid User ID!");
 
-  const reviewsMovie = await ReviewTv.find({ owner: userId})
+  const reviewsMovie = await ReviewSchool.find({ owner: userId})
     .populate({
-      path: "parentTv",
+      path: "parentSchool",
       populate: {
         path: "title",
         select: "title",
@@ -196,13 +196,13 @@ exports.getReviewsByUser = async (req, res) => {
     // .select("title");
  
     const reviews = reviewsMovie.map((r) => {
-      const { owner, content, rating, CRT, parentTv,
+      const { owner, content, rating, CRT, parentSchool,
         LGBTQ_content,
         trans_content,
         anti_religion,
         globalWarming,
         leftWing, _id: reviewID } = r;
-      const { backdrop_path, title, id, TMDB_Id } = parentTv;
+      const { backdrop_path, title, id, TMDB_Id } = parentSchool;
   
       return {
         id: reviewID,
