@@ -146,10 +146,6 @@ exports.getReviewsByMovie = async (req, res) => {
 
     if (!movie) return null;
 
-    
-  
-    
-
   const reviews = movie.reviews.map((r) => {
     const { owner, content, rating, CRT,
       LGBTQ_content,

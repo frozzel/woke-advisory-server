@@ -111,23 +111,6 @@ exports.removeReview = async (req, res) => {
 
 exports.getReviewsBySchool = async (req, res) => {
   const { schoolId } = req.params;
-
-  // const url = 'https://api.themoviedb.org/3/tv/' +movieId+ '?language=en-US';
-  
-
-  // const options = {
-  //   method: 'GET',
-  //   headers: {
-  //     accept: 'application/json',
-  //     Authorization: process.env.TMDB_READ_TOKEN
-  //   }
-  // };
-  // try{
-  //   const response = await fetch(url, options)
- 
-  //   const movieAPI = await response.json();
-    
-  //   const movieTitle = movieAPI.name;
   
   if (!isValidObjectId(schoolId)) return sendError(res, "Invalid School ID!");
   
@@ -144,9 +127,6 @@ exports.getReviewsBySchool = async (req, res) => {
     // .select("reviews title");
     
     if (!movie) return null;
-    
-  
-    
 
   const reviews = movie.SchoolReviews.map((r) => {
     const { owner, content, rating, CRT,
@@ -188,21 +168,24 @@ exports.getReviewsByUser = async (req, res) => {
     .populate({
       path: "parentSchool",
       populate: {
-        path: "title",
-        select: "title",
+        path: "SchoolName",
+        select: "SchoolName",
       },
       
     })
-    // .select("title");
- 
+    // .select("SchoolName");
     const reviews = reviewsMovie.map((r) => {
       const { owner, content, rating, CRT, parentSchool,
-        LGBTQ_content,
-        trans_content,
-        anti_religion,
+        trans_grooming,
+        trans_pronouns,
+        trans_bathroom,
         globalWarming,
-        leftWing, _id: reviewID } = r;
-      const { backdrop_path, title, id, TMDB_Id } = parentSchool;
+        anti_parents_rights, _id: reviewID } = r;
+      const {  SchoolName, id, AddressStreet,
+        AddressCity,
+        AddressState,
+        AddressZip,
+        AddressZip4, } = parentSchool;
   
       return {
         id: reviewID,
@@ -210,16 +193,21 @@ exports.getReviewsByUser = async (req, res) => {
         content,
         rating,
         CRT,
-        LGBTQ_content,
-        trans_content,
-        anti_religion,
+        trans_grooming,
+        trans_pronouns,
+        trans_bathroom,
         globalWarming,
-        leftWing,
-        parentTv: {
+        anti_parents_rights,
+        title: parentSchool.SchoolName,
+        parentSchool: {
           id,
-          title,
-          TMDB_Id,
-          backdrop_path: "https://image.tmdb.org/t/p/original" + backdrop_path
+          SchoolName,
+          AddressStreet,
+          AddressCity,
+          AddressState,
+          AddressZip,
+          AddressZip4,
+         
         },
       };
     });

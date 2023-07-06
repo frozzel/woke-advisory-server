@@ -9,7 +9,7 @@ const reviewSchoolSchema = mongoose.Schema({
   },
   parentSchool: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Movie",
+    ref: "School",
     required: true,
   },
   content: {
