@@ -452,26 +452,27 @@ exports.getAverageRatingsSchool = async (schoolId) => {
     reviews.anti_parents_rights = anti_parents_rights;
 
   }
-
+  
   return reviews;
   } else if (!schoolReview) {
-    const [aggregatedResponse] = await ReviewSchool.aggregate(
-      this.averageRatingPipelineSchool(schoolId)
-    );
+    // const [aggregatedResponse] = await ReviewSchool.aggregate(
+    //   this.averageRatingPipelineSchool(schoolId)
+    // );
     const reviews = {};
     // if(!aggregatedResponse)return null;
-    if (aggregatedResponse) {
-      const { ratingAvg, reviewCount, CRT, trans_grooming, trans_pronouns, trans_bathroom, globalWarming, anti_parents_rights } = aggregatedResponse;
-      reviews.ratingAvg = parseFloat(ratingAvg).toFixed(1);
-      reviews.reviewCount = reviewCount;
-      reviews.CRT = CRT;
-      reviews.trans_grooming = trans_grooming;
-      reviews.trans_pronouns = trans_pronouns;
-      reviews.trans_bathroom =  trans_bathroom;
-      reviews.globalWarming = globalWarming;
-      reviews.anti_parents_rights = anti_parents_rights;
+    // if (aggregatedResponse) {
+    //   const { ratingAvg, reviewCount, CRT, trans_grooming, trans_pronouns, trans_bathroom, globalWarming, anti_parents_rights } = aggregatedResponse;
+    //   reviews.ratingAvg = parseFloat(ratingAvg).toFixed(1);
+    //   reviews.reviewCount = reviewCount;
+    //   reviews.CRT = CRT;
+    //   reviews.trans_grooming = trans_grooming;
+    //   reviews.trans_pronouns = trans_pronouns;
+    //   reviews.trans_bathroom =  trans_bathroom;
+    //   reviews.globalWarming = globalWarming;
+    //   reviews.anti_parents_rights = anti_parents_rights;
   
-    }
+    // }
+    
     return reviews;
   }
 };
