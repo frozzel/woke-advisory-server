@@ -336,6 +336,7 @@ exports.searchMovies = async (req, res) => {
 
     const mapMovies = async (m) => {
       const reviews = await getAverageRatings(m.id);
+      // console.log(reviews);
       return {
         id: m.id,
         title: m.title,

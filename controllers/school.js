@@ -1,8 +1,9 @@
 const School = require("../models/school");
 const { sendError } = require("../utils/error");
 const { isValidObjectId } = require("mongoose");
-const { averageRatingPipelineSchool } = require("../utils/helper");
+const { averageRatingPipelineSchool, getAverageRatingsSchool } = require("../utils/helper");
 const ReviewSchool = require("../models/reviewschool");
+
 
 
 exports.getSingleSchool = async (req, res) => {
@@ -101,26 +102,33 @@ exports.getSingleSchool = async (req, res) => {
   }
   };
 
-  exports.searchSchools = async (req, res) => {
+exports.searchSchools = async (req, res) => {
     const { SchoolName } = req.query;
   
     if (!SchoolName.trim()) return sendError(res, "Invalid request!");
   
     const schools = await School.find({ SchoolName: { $regex: SchoolName, $options: "i" } });
 
-    res.json({
-      results: schools.map((m) => {
-        return {
-          id: m._id,
-          SchoolName: m.SchoolName,
-          AddressStreet: m.AddressStreet,
-          AddressCity: m.AddressCity,
-          AddressState: m.AddressState,
-            AddressZip: m.AddressZip,
-            AddressZip4: m.AddressZip4,
 
-          
-        };
-      }),
-    });
+    const mapSchools = async (s) => {
+      
+      const reviews =  await getAverageRatingsSchool(s._id);
+      
+      return {
+        id: s._id,
+        SchoolName: s.SchoolName,
+        AddressStreet: s.AddressStreet,
+        AddressCity: s.AddressCity,
+        AddressState: s.AddressState,
+        AddressZip: s.AddressZip,
+        AddressZip4: s.AddressZip4,
+        reviews: {...reviews},
+      };
+    };
+
+    const relatedSchools = await Promise.all(schools.map(mapSchools));
+    
+    res.json({ results: relatedSchools });
+
+    
   };
