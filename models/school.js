@@ -56,7 +56,7 @@ const schoolSchema = mongoose.Schema({
     },
     SchoolReviews: [{ type: mongoose.Schema.Types.ObjectId, ref: "ReviewSchool" }],
     SchoolAlerts: [{ type: mongoose.Schema.Types.ObjectId, ref: "SchoolAlerts" }],
-    Teachers: [{ type: mongoose.Schema.Types.ObjectId, ref: "Teachers" }],
+    Teachers: [{ type: mongoose.Schema.Types.ObjectId, ref: "Teacher" }],
     SchoolURL: {
         type: String,
         required: false,
@@ -128,5 +128,5 @@ const schoolSchema = mongoose.Schema({
     },
     { timestamps: true }
     );
-
+schoolSchema.index({ SchoolName: "text" });
 module.exports = mongoose.model('School', schoolSchema);
