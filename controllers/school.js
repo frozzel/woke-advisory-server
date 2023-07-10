@@ -3,7 +3,7 @@ const { sendError } = require("../utils/error");
 const { isValidObjectId } = require("mongoose");
 const { averageRatingPipelineSchool, getAverageRatingsSchool } = require("../utils/helper");
 const ReviewSchool = require("../models/reviewschool");
-
+const Teacher = require("../models/teacher");
 
 
 exports.getSingleSchool = async (req, res) => {
@@ -60,7 +60,8 @@ exports.getSingleSchool = async (req, res) => {
           Virtual,
           IsPrivate,
           SchoolDiggerSchoolURL,
-          SchoolDiggerDistrictURL
+          SchoolDiggerDistrictURL,
+          Teachers,
         } = school;
 
         res.json({ 
@@ -91,7 +92,8 @@ exports.getSingleSchool = async (req, res) => {
           IsPrivate,
           SchoolDiggerSchoolURL,
           SchoolDiggerDistrictURL,
-          SchoolReviews: {...SchoolReviews}
+          SchoolReviews: {...SchoolReviews},
+          Teachers,
         }});
       } else {
      
@@ -131,4 +133,47 @@ exports.searchSchools = async (req, res) => {
     res.json({ results: relatedSchools });
 
     
+  };
+
+exports.getTeacherBySchool = async (req, res) => {
+    const { schoolId } = req.params;
+  
+    try{
+    if (!isValidObjectId(schoolId)) return sendError(res, "Invalid school ID!");
+    
+    const school = await School.findById({  _id: schoolId })
+        .populate({
+        path: "Teachers",
+        populate: {
+          path: "name",
+          // select: "name",
+          // select: "avatar.url",
+        },
+        
+      })
+      // .select("reviews title ");
+      
+    
+  
+      if (!school) return null;
+  
+    const teachers = school.Teachers.map((r) => {
+      const { name, about, grade, classType, avatar, _id: teacherID } = r;
+
+      return {
+        id: teacherID,
+        name,
+        about,
+        grade,
+        classType,
+        avatar,
+
+      };
+    });
+    
+    res.json({ teachers })}
+      catch (error) {
+      console.log(error);
+      return sendError(res, "Movie/TV id is not valid!"); 
+    }
   };

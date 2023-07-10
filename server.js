@@ -13,6 +13,7 @@ const reviewRouter = require("./routes/review"); // import review router
 const reviewTvRouter = require("./routes/reviewtv"); // import review router
 const newsRouter = require("./routes/news"); // import news router
 const reviewSchoolRouter = require("./routes/reviewschool"); // import review router
+const teacherRouter = require('./routes/teacher');// import teacher router
 
 
 
@@ -38,6 +39,7 @@ app.use("/api/review", reviewRouter); // use review router
 app.use("/api/reviewTv", reviewTvRouter); // use review router
 app.use("/api/news", newsRouter); // use news router
 app.use("/api/reviewSchool", reviewSchoolRouter); // use news router
+app.use('/api/teacher', teacherRouter);// use user router
 
 
 

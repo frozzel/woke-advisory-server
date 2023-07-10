@@ -76,6 +76,25 @@ exports.actorInfoValidator = [
         .withMessage("Gender is a required field!"),
     ];
 
+exports.teacherInfoValidator = [
+    check("name").trim().not().isEmpty().withMessage("teacher name is missing!"),
+    check("about")
+        .trim()
+        .not()
+        .isEmpty()
+        .withMessage("About is a required field!"),
+    check("grade")
+        .trim()
+        .not()
+        .isEmpty()
+        .withMessage("Grade is a required field!"),
+    check("classType")
+        .trim()
+        .not()
+        .isEmpty()
+        .withMessage("Class Type is a required field!"),
+    ];
+
 exports.isAdmin = async (req, res, next) => {
     const { user } = req;
 
