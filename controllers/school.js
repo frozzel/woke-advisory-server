@@ -158,7 +158,7 @@ exports.getTeacherBySchool = async (req, res) => {
       if (!school) return null;
   
     const teachers = school.Teachers.map((r) => {
-      const { name, about, grade, classType, avatar, _id: teacherID } = r;
+      const { reviewsTeacher, name, about, grade, classType, avatar, _id: teacherID } = r;
 
       return {
         id: teacherID,
@@ -167,6 +167,8 @@ exports.getTeacherBySchool = async (req, res) => {
         grade,
         classType,
         avatar,
+        reviewsTeacher,
+
 
       };
     });

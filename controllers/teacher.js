@@ -7,6 +7,7 @@ const {
 } = require("../utils/helper");
 const cloudinary = require("../cloud");
 const School = require("../models/school");
+const teacher = require("../models/teacher");
 
 exports.createTeacher = async (req, res) => {
   const {schoolId} = req.params;
@@ -103,14 +104,16 @@ exports.removeTeacher = async (req, res) => {
 
 exports.searchTeacher = async (req, res) => {
   const { name } = req.query;
-  // const result = await Teacher.find({ $text: { $search: `"${query.name}"` } });
-  if (!name.trim()) return sendError(res, "Invalid request!");
+  const { schoolId } = req.params;
+  // const result = await Actor.find({ $text: { $search: `"${query.name}"` } });
+  // if (!name.trim()) return sendError(res, "Invalid request!");
   const result = await Teacher.find({
     name: { $regex: name, $options: "i" },
+    parentSchool: schoolId,
   });
 
-  const teachers = result.map((teacher) => formatTeacher(teacher));
-  res.json({ results: teachers });
+  const actors = result.map((actor) => formatTeacher(actor));
+  res.json({ results: actors });
 };
 
 exports.getLatestTeachers = async (req, res) => {
@@ -127,8 +130,9 @@ exports.getSingleTeacher = async (req, res) => {
   if (!isValidObjectId(id)) return sendError(res, "Invalid request!");
 
   const teacher = await Teacher.findById(id);
+  
   if (!teacher) return sendError(res, "Invalid request, Teacher not found!", 404);
-  res.json({ Teacher: formatTeacher(Teacher) });
+  res.json({ Teacher: teacher});
 };
 
 exports.getTeachers = async (req, res) => {

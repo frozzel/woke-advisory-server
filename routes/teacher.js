@@ -34,7 +34,7 @@ router.post(
 );
 
 router.delete("/:teacherId", isAuth, isAdmin, removeTeacher);
-router.get("/search", isAuth, isAdmin, searchTeacher);
+router.get("/search/:schoolId/",  searchTeacher);
 router.get("/latest-uploads", getLatestTeachers);
 router.get("/teachers", isAuth, isAdmin, getTeachers);
 router.get("/single/:id", getSingleTeacher);
