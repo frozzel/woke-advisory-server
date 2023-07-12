@@ -77,7 +77,7 @@ exports.actorInfoValidator = [
     ];
 
 exports.teacherInfoValidator = [
-    check("name").trim().not().isEmpty().withMessage("teacher name is missing!"),
+    // check("name").trim().not().isEmpty().withMessage("teacher name is missing!"),
     check("about")
         .trim()
         .not()

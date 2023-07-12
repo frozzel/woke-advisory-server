@@ -45,14 +45,14 @@ exports.createTeacher = async (req, res) => {
 // No.2 - if yes then remove old image before uploading new image / avatar.
 
 exports.updateTeacher = async (req, res) => {
-  const { name, about, gender } = req.body;
+  const { name, about, grade, classType,  } = req.body;
   const { file } = req;
   const { teacherId } = req.params;
 
   if (!isValidObjectId(teacherId)) return sendError(res, "Invalid request!");
 
   const teacher = await Teacher.findById(teacherId);
-  if (!teacher) return sendError(res, "Invalid request, record not found!");
+  if (!teacher) return sendError(res, "Invalid request, Teacher not found!");
 
   const public_id = teacher.avatar?.public_id;
 
@@ -70,9 +70,10 @@ exports.updateTeacher = async (req, res) => {
     teacher.avatar = { url, public_id };
   }
 
-  teacher.name = name;
+  
   teacher.about = about;
-  teacher.gender = gender;
+  teacher.grade = grade;
+  teacher.classType = classType;
 
   await teacher.save();
 
@@ -129,7 +130,9 @@ exports.getSingleTeacher = async (req, res) => {
 
   if (!isValidObjectId(id)) return sendError(res, "Invalid request!");
 
-  const teacher = await Teacher.findById(id);
+  const teacher = await Teacher.findById(id)
+    .populate("parentSchool")
+  
   
   if (!teacher) return sendError(res, "Invalid request, Teacher not found!", 404);
   res.json({ Teacher: teacher});
