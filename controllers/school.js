@@ -96,10 +96,6 @@ exports.getSingleSchool = async (req, res) => {
           Teachers,
         }});
       } else {
-     
-
-
-  
     res.json({ school });
   }
   };

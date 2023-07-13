@@ -7,7 +7,8 @@ const {
 } = require("../utils/helper");
 const cloudinary = require("../cloud");
 const School = require("../models/school");
-const teacher = require("../models/teacher");
+const ReviewsTeacher = require("../models/reviewsteacher");
+const { averageRatingPipelineTeacher } = require("../utils/helper");
 
 exports.createTeacher = async (req, res) => {
   const {schoolId} = req.params;
@@ -132,11 +133,58 @@ exports.getSingleTeacher = async (req, res) => {
 
   const teacher = await Teacher.findById(id)
     .populate("parentSchool")
-  
-  
-  if (!teacher) return sendError(res, "Invalid request, Teacher not found!", 404);
-  res.json({ Teacher: teacher});
+
+    if (!teacher) return sendError(res, "Invalid request, Teacher not found!", 404);
+
+    
+    if(teacher.reviewsTeacher.length > 0) {
+      
+      const [aggregatedResponse] = await ReviewsTeacher.aggregate(
+        averageRatingPipelineTeacher(teacher._id)
+      );
+        
+      const reviewsTeacher = {};
+      if(!aggregatedResponse)return null;
+      if (aggregatedResponse) {
+        const { ratingAvg, reviewCount, CRT, trans_grooming, trans_sports, trans_pronouns, globalWarming, anti_parents_rights} = aggregatedResponse;
+        reviewsTeacher.ratingAvg = parseFloat(ratingAvg).toFixed(1);
+        reviewsTeacher.reviewCount = reviewCount;
+        reviewsTeacher.CRT = CRT;
+        reviewsTeacher.trans_grooming = trans_grooming;
+        reviewsTeacher.trans_pronouns = trans_pronouns;
+        reviewsTeacher.trans_sports = trans_sports;
+        reviewsTeacher.globalWarming = globalWarming;
+        reviewsTeacher.anti_parents_rights = anti_parents_rights;
+        
+      }
+      const {
+        _id,
+        name,
+        about,
+        grade,
+        classType,
+        avatar,
+        parentSchool,
+        alertsTeacher,
+      } = teacher;
+
+      res.json({
+        Teacher: {
+        _id,
+        name,
+        about,
+        grade,
+        classType,
+        avatar,
+        parentSchool,
+        reviewsTeacher: { ...reviewsTeacher },
+        alertsTeacher,
+      }});
+    } else {
+      res.json({Teacher: teacher});
+    }
 };
+  
 
 exports.getTeachers = async (req, res) => {
   const { pageNo, limit } = req.query;
