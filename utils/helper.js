@@ -48,7 +48,7 @@ exports.formatActor = (actor) => {
   };
 };
 exports.formatTeacher = (actor) => {
-  const { name, grade, classType, about, _id, avatar, parentSchool } = actor;
+  const { name, grade, classType, about, _id, avatar, parentSchool, reviewsTeacher} = actor;
   return {
     id: _id,
     name,
@@ -56,7 +56,8 @@ exports.formatTeacher = (actor) => {
     grade,
     classType,
     avatar: avatar?.url,
-    parentSchool
+    parentSchool, 
+    reviewsTeacher,
   };
 };
 exports.formatUser = (user) => {

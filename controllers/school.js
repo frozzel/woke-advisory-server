@@ -3,8 +3,7 @@ const { sendError } = require("../utils/error");
 const { isValidObjectId } = require("mongoose");
 const { averageRatingPipelineSchool, getAverageRatingsSchool } = require("../utils/helper");
 const ReviewSchool = require("../models/reviewschool");
-const Teacher = require("../models/teacher");
-
+const { getAverageRatingsTeacher } = require("../utils/helper");
 
 exports.getSingleSchool = async (req, res) => {
     const { schoolId } = req.params;
@@ -142,36 +141,37 @@ exports.getTeacherBySchool = async (req, res) => {
         path: "Teachers",
         populate: {
           path: "name",
-          // select: "name",
-          // select: "avatar.url",
+   
         },
+        
         
       })
       // .select("reviews title ");
       
-    
+
   
       if (!school) return null;
-  
-    const teachers = school.Teachers.map((r) => {
-      const { reviewsTeacher, name, about, grade, classType, avatar, _id: teacherID } = r;
+   
 
+    const mapTeachers = async (t) => {
+      const reviewsTeacher =  await getAverageRatingsTeacher(t._id);
       return {
-        id: teacherID,
-        name,
-        about,
-        grade,
-        classType,
-        avatar,
-        reviewsTeacher,
-
-
+        id: t._id,
+        name: t.name,
+        about: t.about,
+        grade: t.grade,
+        classType: t.classType,
+        avatar: t.avatar,
+        reviewsTeacher: {...reviewsTeacher},
       };
-    });
+    };
+
     
-    res.json({ teachers })}
+
+    const relatedTeachers = await Promise.all(school.Teachers.map(mapTeachers));
+    res.json({ teachers: relatedTeachers })}
       catch (error) {
       console.log(error);
-      return sendError(res, "Movie/TV id is not valid!"); 
+      return sendError(res, "Teacher/School id is not valid!"); 
     }
   };
