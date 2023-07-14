@@ -9,6 +9,7 @@ const cloudinary = require("../cloud");
 const School = require("../models/school");
 const ReviewsTeacher = require("../models/reviewsteacher");
 const { averageRatingPipelineTeacher } = require("../utils/helper");
+const { getAverageRatingsTeacher } = require("../utils/helper");
 
 exports.createTeacher = async (req, res) => {
   const {schoolId} = req.params;
@@ -112,10 +113,25 @@ exports.searchTeacher = async (req, res) => {
   const result = await Teacher.find({
     name: { $regex: name, $options: "i" },
     parentSchool: schoolId,
+   
   });
 
-  const actors = result.map((actor) => formatTeacher(actor));
-  res.json({ results: actors });
+  const mapTeachers = async (t) => {
+    const reviewsTeacher =  await getAverageRatingsTeacher(t._id);
+    return {
+      id: t._id,
+      name: t.name,
+      about: t.about,
+      grade: t.grade,
+      classType: t.classType,
+      avatar: t.avatar,
+      reviewsTeacher: {...reviewsTeacher},
+    };
+  };
+  const relatedTeachers = await Promise.all(result.map(mapTeachers));
+
+  // const actors = result.map((actor) => formatTeacher(actor));
+  res.json({ results: relatedTeachers });
 };
 
 exports.getLatestTeachers = async (req, res) => {

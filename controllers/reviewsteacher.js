@@ -65,12 +65,12 @@ exports.addReview = async (req, res) => {
 
 exports.updateReview = async (req, res) => {
     const { reviewId } = req.params;
-    const { content, rating, CRT, trans_grooming, trans_pronouns, trans_spor, globalWarming, anti_parents_rights} = req.body;
+    const { content, rating, CRT, trans_grooming, trans_pronouns, trans_sports, globalWarming, anti_parents_rights} = req.body;
     const userId = req.user._id;
   
     if (!isValidObjectId(reviewId)) return sendError(res, "Invalid Review ID!");
   
-    const review = await ReviewSchool.findOne({ owner: userId, _id: reviewId });
+    const review = await ReviewsTeacher.findOne({ owner: userId, _id: reviewId });
     if (!review) return sendError(res, "Review not found!", 404);
   
     review.content = content;
@@ -78,7 +78,7 @@ exports.updateReview = async (req, res) => {
     review.CRT = CRT;
     review.trans_grooming = trans_grooming;
     review.trans_pronouns= trans_pronouns;
-    review.trans_spor = trans_spor;
+    review.trans_sports = trans_sports;
     review.globalWarming = globalWarming;
     review.anti_parents_rights = anti_parents_rights;
 
@@ -93,28 +93,28 @@ exports.removeReview = async (req, res) => {
 
   if (!isValidObjectId(reviewId)) return sendError(res, "Invalid review ID!");
 
-  const review = await ReviewSchool.findOne({ owner: userId, _id: reviewId });
+  const review = await ReviewsTeacher.findOne({ owner: userId, _id: reviewId });
   if (!review) return sendError(res, "Invalid request, review not found!");
 
-  const movie = await School.findById(review.parentSchool).select("SchoolReviews");
+  const movie = await Teacher.findById(review.parentTeacher).select("reviewsTeacher");
   
-  movie.SchoolReviews = movie.SchoolReviews.filter((rId) => rId.toString() !== reviewId);
+  movie.reviewsTeacher = movie.reviewsTeacher.filter((rId) => rId.toString() !== reviewId);
   
-  await ReviewSchool.findByIdAndDelete(reviewId);
+  await ReviewsTeacher.findByIdAndDelete(reviewId);
 
   await movie.save();
 
   res.json({ message: "Review removed successfully." });
   };
 
-exports.getReviewsBySchool = async (req, res) => {
-  const { schoolId } = req.params;
+exports.getReviewsByTeacher = async (req, res) => {
+  const { teacherId } = req.params;
   
-  if (!isValidObjectId(schoolId)) return sendError(res, "Invalid School ID!");
+  if (!isValidObjectId(teacherId)) return sendError(res, "Invalid Teacher ID!");
   
-  const movie = await School.findOne({ _id: schoolId })
+  const movie = await Teacher.findOne({ _id: teacherId })
       .populate({
-      path: "SchoolReviews",
+      path: "reviewsTeacher",
       populate: {
         path: "owner",
         
@@ -126,11 +126,11 @@ exports.getReviewsBySchool = async (req, res) => {
     
     if (!movie) return null;
 
-  const reviews = movie.SchoolReviews.map((r) => {
+  const reviews = movie.reviewsTeacher.map((r) => {
     const { owner, content, rating, CRT,
       trans_grooming,
       trans_pronouns,
-      trans_spor,
+      trans_sports,
       globalWarming,
       anti_parents_rights, _id: reviewID } = r;
     const { name, _id: ownerId, avatar } = owner;
@@ -147,7 +147,7 @@ exports.getReviewsBySchool = async (req, res) => {
       CRT,
       trans_grooming,
       trans_pronouns,
-      trans_spor,
+      trans_sports,
       globalWarming,
       anti_parents_rights
     };
@@ -162,28 +162,24 @@ exports.getReviewsByUser = async (req, res) => {
 
   if (!isValidObjectId(userId)) return sendError(res, "Invalid User ID!");
 
-  const reviewsMovie = await ReviewSchool.find({ owner: userId})
+  const reviewsMovie = await ReviewsTeacher.find({ owner: userId})
     .populate({
-      path: "parentSchool",
+      path: "parentTeacher",
       populate: {
-        path: "SchoolName",
-        select: "SchoolName",
+        path: "name",
+        select: "name",
       },
       
     })
     // .select("SchoolName");
     const reviews = reviewsMovie.map((r) => {
-      const { owner, content, rating, CRT, parentSchool,
+      const { owner, content, rating, CRT, parentTeacher,
         trans_grooming,
         trans_pronouns,
-        trans_spor,
+        trans_sports,
         globalWarming,
         anti_parents_rights, _id: reviewID } = r;
-      const {  SchoolName, id, AddressStreet,
-        AddressCity,
-        AddressState,
-        AddressZip,
-        AddressZip4, } = parentSchool;
+      const {  name, id, grade, classType,  } = parentTeacher;
   
       return {
         id: reviewID,
@@ -193,18 +189,16 @@ exports.getReviewsByUser = async (req, res) => {
         CRT,
         trans_grooming,
         trans_pronouns,
-        trans_spor,
+        trans_sports,
         globalWarming,
         anti_parents_rights,
-        title: parentSchool.SchoolName,
-        parentSchool: {
+        title: parentTeacher.name,
+        parentTeacher: {
           id,
-          SchoolName,
-          AddressStreet,
-          AddressCity,
-          AddressState,
-          AddressZip,
-          AddressZip4,
+          name,
+          grade,
+          classType,
+          
          
         },
       };
