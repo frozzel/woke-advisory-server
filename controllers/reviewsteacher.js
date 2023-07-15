@@ -179,7 +179,7 @@ exports.getReviewsByUser = async (req, res) => {
         trans_sports,
         globalWarming,
         anti_parents_rights, _id: reviewID } = r;
-      const {  name, id, grade, classType,  } = parentTeacher;
+      const {  name, id, grade, classType, avatar } = parentTeacher;
   
       return {
         id: reviewID,
@@ -198,6 +198,7 @@ exports.getReviewsByUser = async (req, res) => {
           name,
           grade,
           classType,
+          avatar
           
          
         },
