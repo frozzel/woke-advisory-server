@@ -80,6 +80,13 @@ exports.parseData = (req, res, next) => {
   
   next();
 };
+exports.parseDataAlerts = (req, res, next) => {
+  const { content } = req.body;
+  console.log(req.body)
+  if (content) req.body.content = JSON.parse(content);
+  
+  next();
+};
 
 exports.averageRatingPipeline = (movieId) => {
   return [
