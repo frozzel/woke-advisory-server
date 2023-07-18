@@ -55,7 +55,7 @@ const schoolSchema = mongoose.Schema({
         
     },
     SchoolReviews: [{ type: mongoose.Schema.Types.ObjectId, ref: "ReviewSchool" }],
-    SchoolAlerts: [{ type: mongoose.Schema.Types.ObjectId, ref: "SchoolAlerts" }],
+    alertsSchool: [{ type: mongoose.Schema.Types.ObjectId, ref: "AlertsSchool" }],
     Teachers: [{ type: mongoose.Schema.Types.ObjectId, ref: "Teacher" }],
     SchoolURL: {
         type: String,
