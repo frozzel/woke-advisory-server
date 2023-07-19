@@ -47,7 +47,7 @@ exports.getAlertsSchool = async (req, res) => {
     if (!isValidObjectId(schoolId)) return sendError(res, "Invalid school!");
     const school = await School.findById(schoolId);
     if (!school) return sendError(res, "School not found!");
-    const alerts = await AlertsSchool.find({school: schoolId}).populate("owner", "name avatar").populate("comments.user", "name avatar").populate("likes.user", "name avatar");
+    const alerts = await AlertsSchool.find({school: schoolId}).populate("owner", "name avatar").populate("comments.user", "name avatar").populate("likes.user", "name avatar").populate("school", "SchoolName");
     res.status(200).json({alerts});
 
 }
