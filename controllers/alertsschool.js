@@ -28,7 +28,16 @@ exports.addAlertsSchool = async (req, res) => {
     
 
     if (file) {
-        const {url, public_id} = await uploadImageToCloud(file.path);
+        const {url, public_id} = await cloudinary.uploader.upload(file.path, 
+            // {
+        //     transformation: {
+        //         width: 1280,
+        //         height: 720,
+        //         crop: "cover"
+
+        //     }
+        // }
+        );
         alert.image = {url, public_id};
     }
 

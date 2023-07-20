@@ -15,7 +15,7 @@ exports.getNews = async (req, res) => {
         }
       };
     try{
-      const response = await fetch('https://newsapi.org/v2/everything?q=school+transgender&searchIn=title&from=2023-07-06&to=2023-07-13&sortBy=popularity', options);
+      const response = await fetch('https://newsapi.org/v2/everything?q=school+transgender&searchIn=title&from=2023-07-13&to=2023-07-20&sortBy=popularity', options);
     
       const news = await response.json();
       const mapNews = async (n) => {
