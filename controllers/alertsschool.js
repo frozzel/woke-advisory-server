@@ -72,6 +72,9 @@ exports.addComment = async (req, res) => {
     alert.comments.push({user: user._id, content});
     
     await alert.save();
+
+    await alert.populate("comments.user", "name avatar");
+
     res.status(201).json({alert});
 }
 
