@@ -74,6 +74,7 @@ exports.addComment = async (req, res) => {
     await alert.save();
 
     await alert.populate("comments.user", "name avatar");
+    
 
     res.status(201).json({alert});
 }
@@ -93,6 +94,7 @@ exports.likeAlert = async (req, res) => {
         alert.likes.splice(index, 1);
     }
     await alert.save();
+    await alert.populate("likes.user", "name avatar");
     res.status(201).json({alert});
 }
 
