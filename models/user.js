@@ -39,6 +39,11 @@ const userSchema = mongoose.Schema({
         trim: true,
         required: false
     },
+    schoolsFollowing: [{ type: mongoose.Schema.Types.ObjectId, ref: "School" }],
+    teachersFollowing: [{ type: mongoose.Schema.Types.ObjectId, ref: "Teacher" }],
+    following: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], 
+
 }, 
 { timestamps: true }
 )

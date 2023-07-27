@@ -47,6 +47,7 @@ exports.signInValidator = [
 
 exports.isAuth = async(req, res, next) => {
     const token =  req.headers?.authorization
+    
     if (!token) return sendError(res, 'Invalid token!', 401)
   
     const jwtToken = token.split('Bearer ')[1]

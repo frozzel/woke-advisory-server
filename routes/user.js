@@ -17,7 +17,7 @@ router.post("/sign-in", signInValidator, validate, signIn);
 
 router.get('/is-auth', isAuth, (req, res) => {
   const {user} = req;
-  res.json({user: {id: user._id, email: user.email, name: user.name, isVerified: user.isVerified, role: user.role}})
+  res.json({user: {id: user._id, email: user.email, name: user.name, isVerified: user.isVerified, role: user.role, following: user.following, followers: user.followers, schoolsFollowing: user.schoolsFollowing, teachersFollowing: user.teachersFollowing}})
 })
 
 router.get("/profile/:userId", isAuth, userInfo)

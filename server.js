@@ -17,6 +17,7 @@ const teacherRouter = require('./routes/teacher');// import teacher router
 const alertsSchoolRouter = require("./routes/alertsschool"); // import review router
 const reviewsTeacherRouter = require("./routes/reviewsteacher"); // import review router
 const alertsTeacherRouter = require("./routes/alertsteacher"); // import review router
+const followRouter = require('./routes/follow');// import follow router
 
 
 
@@ -47,7 +48,7 @@ app.use('/api/teacher', teacherRouter);// use user router
 app.use("/api/reviewsTeacher", reviewsTeacherRouter); // use review router
 app.use('/api/alertsSchool', alertsSchoolRouter);// use user router
 app.use('/api/alertsTeacher', alertsTeacherRouter);// use user router
-
+app.use('/api/follow', followRouter);// use user router
 
 
 app.use('/*', handleNotFound) // catch 404 and forward to error handler

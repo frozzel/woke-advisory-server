@@ -14,7 +14,7 @@ exports.addAlertsSchool = async (req, res) => {
     const {schoolId} = req.params;
     
     const {file,  } = req;
-    const userId = req.user._id;
+    const userId = req.user.id;
 
     if (!isValidObjectId(schoolId)) return sendError(res, "Invalid school!");
     if (!isValidObjectId(userId)) return sendError(res, "Invalid user!");
