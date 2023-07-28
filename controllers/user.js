@@ -246,10 +246,10 @@ exports.userInfo = async (req, res) => {
 
   if (!isValidObjectId(userId)) return sendError(res, "Invalid user!");
 
-  const user = await User.findById(userId);
+  const user = await User.findById(userId).populate("following", "name avatar bio").populate("followers", "name avatar bio").populate("schoolsFollowing", "SchoolName AddressStreet AddressCity AddressState AddressZip").populate("teachersFollowing", "name avatar about");
   if (!user) return sendError(res, "user not found!", 404);
 
-  res.json({user: {id: user._id, name: user.name, email: user.email, isVerified: user.isVerified, role: user.role, avatar: user.avatar?.url, bio: user.bio}})
+  res.json({user: {id: user._id, name: user.name, email: user.email, isVerified: user.isVerified, role: user.role, avatar: user.avatar?.url, bio: user.bio, schoolsFollowing: user.schoolsFollowing, teachersFollowing: user.teachersFollowing, following: user.following, followers: user.followers}})
 }
 
 exports.updateUser = async (req, res) => {
