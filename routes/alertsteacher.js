@@ -2,7 +2,7 @@ const router = require("express").Router();
 const { isAuth, validate } = require("../utils/auth");
 const { addAlertsTeacher, getAlertsTeacher, addComment, likeAlert, editAlert, deleteAlert } = require("../controllers/alertsteacher");
 const { uploadImage } = require("../utils/multer");
-const e = require("express");
+// const e = require("express");
 
 
 
