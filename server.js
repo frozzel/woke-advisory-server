@@ -4,6 +4,8 @@ const morgan = require('morgan')    // import morgan
 const {errorHandler} = require('./utils/error')// import error handler
 require('dotenv').config()// import dotenv
 require('./config/connections')//   import database connection
+const socketio = require('socket.io');
+
 
 const schoolRouter = require('./routes/school');// import school router
 const userRouter = require('./routes/user');// import user router
@@ -18,6 +20,7 @@ const alertsSchoolRouter = require("./routes/alertsschool"); // import review ro
 const reviewsTeacherRouter = require("./routes/reviewsteacher"); // import review router
 const alertsTeacherRouter = require("./routes/alertsteacher"); // import review router
 const followRouter = require('./routes/follow');// import follow router
+const messagesRouter = require('./routes/post');
 
 
 
@@ -34,6 +37,14 @@ app.use(cors())
 app.use(express.json())// parse json request body
 app.use(morgan('dev'))// log http requests
 
+
+const server = require('http').Server(app);
+const io = socketio(server, {
+    cors: {
+      origin: '*',
+    }
+  });
+
 app.use('/api/school', schoolRouter);// use user router
 app.use("/api/admin", adminRouter); // use admin router
 app.use('/api/user', userRouter);// use user router
@@ -49,6 +60,7 @@ app.use("/api/reviewsTeacher", reviewsTeacherRouter); // use review router
 app.use('/api/alertsSchool', alertsSchoolRouter);// use user router
 app.use('/api/alertsTeacher', alertsTeacherRouter);// use user router
 app.use('/api/follow', followRouter);// use user router
+app.use('/post', messagesRouter);
 
 
 app.use('/*', handleNotFound) // catch 404 and forward to error handler
@@ -59,8 +71,21 @@ app.use(errorHandler)// use error handler
 
 const PORT = process.env.PORT || 8080// define a port
 
+io.on('connection', (socket) => {
+    console.log(`Socket ${socket.id} connected`);
+  
+    socket.on('sendMessage', (message) => {
+        console.log(message)
+      io.emit('message', message);
+    });
+  
+    socket.on('disconnect', () => {
+      console.log(`Socket ${socket.id} disconnected`);
+    });
+  });
 
-app.listen(PORT,  () => {// start express server on port 3000
+
+server.listen(PORT,  () => {// start express server on port 3000
     console.log(`..............................................`)
     console.log(`🚀  Server running on http://localhost:${PORT}, 🚀`)
     console.log(`...............................................`)
