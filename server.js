@@ -41,7 +41,7 @@ app.use(morgan('dev'))// log http requests
 const server = require('http').Server(app);
 const io = socketio(server, {
     cors: {
-      origin: '*',
+      origin: process.env.CORS,
     }
   });
 

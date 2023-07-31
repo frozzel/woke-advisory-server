@@ -39,6 +39,7 @@
     "unsplash-js": "^7.0.18"
   },
   "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "nodemon": "^2.0.20"
   }
 }
