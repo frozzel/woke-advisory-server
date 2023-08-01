@@ -78,6 +78,10 @@ io.on('connection', (socket) => {
         console.log(message)
       io.emit('message', message);
     });
+
+    socket.on('sendSchool', (message) => {
+        io.emit('school', message);
+      });
   
     socket.on('disconnect', () => {
       console.log(`Socket ${socket.id} disconnected`);
