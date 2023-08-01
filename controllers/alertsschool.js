@@ -45,10 +45,15 @@ exports.addAlertsSchool = async (req, res) => {
     alert.school = schoolId;
     alert.owner = userId;
     alert.content = content;
+
+    
     
     await school.save();
     await alert.save();
-    res.status(201).json({alert});
+
+    const alert2 = await AlertsSchool.findById(alert._id).populate("owner", "name avatar").populate("school", "SchoolName")
+   
+    res.status(201).json({alert: alert2});
 }
 
 exports.getAlertsSchool = async (req, res) => {
