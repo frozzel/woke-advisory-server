@@ -82,6 +82,10 @@ io.on('connection', (socket) => {
     socket.on('sendSchool', (message) => {
         io.emit('school', message);
       });
+
+    socket.on('sendDelete', (message) => {
+      io.emit('delete', message);
+    });
   
     socket.on('disconnect', () => {
       console.log(`Socket ${socket.id} disconnected`);
