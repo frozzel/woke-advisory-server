@@ -62,6 +62,7 @@ exports.getAlertsSchool = async (req, res) => {
     const school = await School.findById(schoolId);
     if (!school) return sendError(res, "School not found!");
     const alerts = await AlertsSchool.find({school: schoolId}).populate("owner", "name avatar").populate("comments.user", "name avatar").populate("likes.user", "name avatar").populate("school", "SchoolName");
+    
     res.status(200).json({alerts});
 
 }
@@ -158,5 +159,8 @@ exports.deleteAlert = async (req, res) => {
         }
     }
     await alert.remove();
-    res.status(201).json({alert});
+
+    const alerts = await AlertsSchool.find({school: alert.school}).populate("owner", "name avatar").populate("comments.user", "name avatar").populate("likes.user", "name avatar").populate("school", "SchoolName");
+    
+    res.status(201).json({alerts});
 }
