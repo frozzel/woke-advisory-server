@@ -76,9 +76,9 @@ io.on('connection', (socket) => {
     console.log(`Socket ${socket.id} connected`);
 
     socket.on('room', (schoolId, pass) => {
-
       socket.join(schoolId);
       console.log(`Socket ${socket.id} joined room ${schoolId}`);
+      console.log('sending message',  pass)
       io.to(schoolId).emit('msg', pass);
       
       }
@@ -86,6 +86,7 @@ io.on('connection', (socket) => {
 
     socket.on('roomDelete', (schoolId, pass) => {
       console.log(`Socket ${socket.id} joined roomDelete ${schoolId}`);
+      console.log('deleting message',  pass)
       io.to(schoolId).emit('delete', pass);
       }
       ); 
