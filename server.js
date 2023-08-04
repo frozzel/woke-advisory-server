@@ -96,6 +96,13 @@ io.on('connection', (socket) => {
       io.to(alertId).emit('add', alert);
       }
       );
+
+    socket.on('roomLike', (alertId, alert) => {
+      socket.join(alertId);
+      console.log(`Socket ${socket.id} joined roomLike ${alertId}`);
+      io.to(alertId).emit('like', alert);
+      }
+      );
   
     socket.on('disconnect', () => {
       console.log(`Socket ${socket.id} disconnected`);
