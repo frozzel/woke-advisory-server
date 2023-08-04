@@ -42,7 +42,7 @@ app.use(morgan('dev'))// log http requests
 const server = require('http').Server(app);
 const io = socketio(server, {
     cors: {
-      origin: process.env.CORS,
+      origin: ['http://localhost:3000:*', 'https://wokeadvisory.com:*', 'https://www.wokeadvisory.com:*'],
     }
   });
 
