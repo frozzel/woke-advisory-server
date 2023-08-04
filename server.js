@@ -42,7 +42,7 @@ app.use(morgan('dev'))// log http requests
 const server = require('http').Server(app);
 const io = socketio(server, {
     cors: {
-      origin: ['http://localhost:3000', 'https://wokeadvisory.com', 'https://www.wokeadvisory.com'],
+      origin: [process.env.CORS, "https://www.wokeadvisory.com"],
     }
   });
 
@@ -78,18 +78,24 @@ io.on('connection', (socket) => {
     socket.on('room', (schoolId, pass) => {
       socket.join(schoolId);
       console.log(`Socket ${socket.id} joined room ${schoolId}`);
-      console.log('sending message',  pass)
       io.to(schoolId).emit('msg', pass);
       
       }
       );
 
     socket.on('roomDelete', (schoolId, pass) => {
+      socket.join(schoolId);
       console.log(`Socket ${socket.id} joined roomDelete ${schoolId}`);
-      console.log('deleting message',  pass)
       io.to(schoolId).emit('delete', pass);
       }
       ); 
+
+    socket.on('roomComment', (alertId, alert) => {
+      socket.join(alertId);
+      console.log(`Socket ${socket.id} joined roomComment ${alertId}`);
+      io.to(alertId).emit('add', alert);
+      }
+      );
   
     socket.on('disconnect', () => {
       console.log(`Socket ${socket.id} disconnected`);
