@@ -93,14 +93,15 @@ io.on('connection', (socket) => {
     socket.on('roomComment', (alertId, alert) => {
       socket.join(alertId);
       console.log(`Socket ${socket.id} joined roomComment ${alertId}`);
-      io.to(alertId).emit('add', alert);
+      console.log(alert)
+      io.to(alertId).emit(`add${alertId}`, alert);
       }
       );
 
     socket.on('roomLike', (alertId, alert) => {
       socket.join(alertId);
       console.log(`Socket ${socket.id} joined roomLike ${alertId}`);
-      io.to(alertId).emit('like', alert);
+      io.to(alertId).emit(`like${alertId}`, alert);
       }
       );
   

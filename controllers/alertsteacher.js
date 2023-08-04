@@ -49,7 +49,11 @@ exports.addAlertsTeacher = async (req, res) => {
     
     await teacher.save();
     await alert.save();
-    res.status(201).json({alert});
+
+    const alert2 = await AlertsTeacher.findById(alert._id).populate("owner", "name avatar").populate("teacher", "name")
+
+
+    res.status(201).json({alert: alert2});
 }
 
 exports.getAlertsTeacher = async (req, res) => {
@@ -154,5 +158,9 @@ exports.deleteAlert = async (req, res) => {
         }
     }
     await alert.remove();
-    res.status(201).json({alert});
+
+    const alerts = await AlertsTeacher.find({teacher: alert.teacher}).populate("owner", "name avatar").populate("comments.user", "name avatar").populate("likes.user", "name avatar").populate("teacher", "name");
+
+
+    res.status(201).json({alerts});
 }
