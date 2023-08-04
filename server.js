@@ -30,6 +30,7 @@ const movie1Router = require("./routes/movie1"); // import admin router
 
 const cors = require('cors'); // import cors (cross origin resource sharing) can also be done in the client side with proxy
 const { handleNotFound } = require('./utils/helper');
+const school = require('./models/school');
 
 
 const app = express();// create express app
@@ -73,19 +74,21 @@ const PORT = process.env.PORT || 8080// define a port
 
 io.on('connection', (socket) => {
     console.log(`Socket ${socket.id} connected`);
-  
-    socket.on('sendMessage', (message) => {
-        console.log(message)
-      io.emit('message', message);
-    });
 
-    socket.on('sendSchool', (message) => {
-        io.emit('school', message);
-      });
+    socket.on('room', (schoolId, pass) => {
 
-    socket.on('sendDelete', (message) => {
-      io.emit('delete', message);
-    });
+      socket.join(schoolId);
+      console.log(`Socket ${socket.id} joined room ${schoolId}`);
+      io.to(schoolId).emit('msg', pass);
+      
+      }
+      );
+
+    socket.on('roomDelete', (schoolId, pass) => {
+      console.log(`Socket ${socket.id} joined roomDelete ${schoolId}`);
+      io.to(schoolId).emit('delete', pass);
+      }
+      ); 
   
     socket.on('disconnect', () => {
       console.log(`Socket ${socket.id} disconnected`);
