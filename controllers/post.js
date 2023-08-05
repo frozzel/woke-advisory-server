@@ -5,6 +5,7 @@ const User = require("../models/user");
 const cloudinary = require("../cloud");
 const Post = require("../models/post");
 const { uploadImageToCloud } = require("../utils/helper");
+const AlertsTeacher = require("../models/alertsteacher");
 
 
 
@@ -54,10 +55,21 @@ exports.getPostUser = async (req, res) => {
     if (!isValidObjectId(userId)) return sendError(res, "Invalid User!");
     const user = await User.findById(userId).populate('teachersFollowing', 'name avatar').populate('schoolsFollowing', 'SchoolName ');
     if (!user) return sendError(res, "User not found!");
-    const following = [userId, ...user.following.map(user => user._id)]
-    const alerts = await Post.find({owner: following}).populate("owner", "name avatar").populate("comments.user", "name avatar").populate("likes.user", "name avatar");
+    
+    const following = [userId, ...user.following.map(user => user._id)];
+    const schoolsFollowing = user.schoolsFollowing.map(school => school._id);
+    const teachersFollowing = user.teachersFollowing.map(teacher => teacher._id);
+    const alerts = await Post.find({owner: following}).populate("owner", "name avatar").populate("comments.user", "name avatar").populate("likes.user", "name avatar") 
+    const alerts2 = await AlertsSchool.find({school: schoolsFollowing}).populate("owner", "name avatar").populate("comments.user", "name avatar").populate("likes.user", "name avatar").populate("school", "SchoolName");
+    const alerts3 = await AlertsTeacher.find({teacher: teachersFollowing}).populate("owner", "name avatar").populate("comments.user", "name avatar").populate("likes.user", "name avatar").populate("teacher", "name");
+    const allAlerts = [...alerts, ...alerts2, ...alerts3];
+
+    allAlerts.sort((a, b) => {
+        return new Date(b.createdAt) - new Date(a.createdAt);
+    })
+    // console.log({"alerts": allAlerts});
  
-    res.status(200).json({alerts, following});
+    res.status(200).json({"alerts": allAlerts, following, schoolsFollowing, teachersFollowing});
 
 }
 exports.addComment = async (req, res) => {
