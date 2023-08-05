@@ -1,34 +1,33 @@
 const {isValidObjectId} = require("mongoose");
 const {sendError} = require("../utils/helper");
 const AlertsSchool = require("../models/alertsschool");
-const School = require("../models/school");
 const User = require("../models/user");
 const cloudinary = require("../cloud");
-
+const Post = require("../models/post");
 const { uploadImageToCloud } = require("../utils/helper");
+
 
 
 exports.addPostUser = async (req, res) => {
     
     const {content} = req.body;
-    const {schoolId} = req.params;
+    const {userId} = req.params;
     
     const {file,  } = req;
-    const userId = req.user.id;
+    // const userId = req.user.id;
 
-    if (!isValidObjectId(schoolId)) return sendError(res, "Invalid school!");
     if (!isValidObjectId(userId)) return sendError(res, "Invalid user!");
 
-    const school = await School.findById(schoolId);
+    const user = await User.findById(userId);
 
-    if (!school) return sendError(res, "School not found!");
+    if (!user) return sendError(res, "User not found!");
  
-    const alert = new AlertsSchool({
+    const alert = new Post({
     });
     
 
     if (file) {
-        const {url, public_id} = await cloudinary.uploader.upload(file.path, 
+        const {secure_url: url, public_id} = await cloudinary.uploader.upload(file.path, 
             // {
         //     transformation: {
         //         width: 1280,
@@ -41,34 +40,35 @@ exports.addPostUser = async (req, res) => {
         alert.image = {url, public_id};
     }
 
-    school.alertsSchool.push(alert._id);
-    alert.school = schoolId;
+    user.post.push(alert._id);
     alert.owner = userId;
     alert.content = content;
     
-    await school.save();
+    await user.save();
     await alert.save();
     res.status(201).json({alert});
 }
 
 exports.getPostUser = async (req, res) => {
-    const {schoolId} = req.params;
-    if (!isValidObjectId(schoolId)) return sendError(res, "Invalid school!");
-    const school = await School.findById(schoolId);
-    if (!school) return sendError(res, "School not found!");
-    const alerts = await AlertsSchool.find({school: schoolId}).populate("owner", "name avatar").populate("comments.user", "name avatar").populate("likes.user", "name avatar").populate("school", "SchoolName");
-    res.status(200).json({alerts});
+    const {userId} = req.params;
+    if (!isValidObjectId(userId)) return sendError(res, "Invalid User!");
+    const user = await User.findById(userId).populate('teachersFollowing', 'name avatar').populate('schoolsFollowing', 'SchoolName ');
+    if (!user) return sendError(res, "User not found!");
+    const following = [userId, ...user.following.map(user => user._id)]
+    const alerts = await Post.find({owner: following}).populate("owner", "name avatar").populate("comments.user", "name avatar").populate("likes.user", "name avatar");
+ 
+    res.status(200).json({alerts, following});
 
 }
 exports.addComment = async (req, res) => {
-    const {alertId} = req.params;
+    const {postId} = req.params;
     const {content} = req.body;
     const {user} = req;
     
-    if (!isValidObjectId(alertId)) return sendError(res, "Invalid alert!");
+    if (!isValidObjectId(postId)) return sendError(res, "Invalid Post!");
     if (!isValidObjectId(user._id)) return sendError(res, "Invalid user!");
-    const alert = await AlertsSchool.findById(alertId);
-    if (!alert) return sendError(res, "Alert not found!");
+    const alert = await Post.findById(postId);
+    if (!alert) return sendError(res, "Post not found!");
     alert.comments.push({user: user._id, content});
     
     await alert.save();
@@ -80,12 +80,12 @@ exports.addComment = async (req, res) => {
 }
 
 exports.likeAlert = async (req, res) => {
-    const {alertId} = req.params;
+    const {postId} = req.params;
     const {user} = req;
     
-    if (!isValidObjectId(alertId)) return sendError(res, "Invalid alert!");
+    if (!isValidObjectId(postId)) return sendError(res, "Invalid Post!");
     if (!isValidObjectId(user._id)) return sendError(res, "Invalid user!");
-    const alert = await AlertsSchool.findById(alertId);
+    const alert = await Post.findById(postId);
     if (!alert) return sendError(res, "Alert not found!");
     const index = alert.likes.findIndex(like => like.user.toString() === user._id.toString());
     if (index === -1) {
@@ -128,21 +128,21 @@ exports.editAlert = async (req, res) => {
 }
 
 exports.deleteAlert = async (req, res) => {
-    const {alertId} = req.params;
+    const {postId} = req.params;
     const {user} = req;
     
-    if (!isValidObjectId(alertId)) return sendError(res, "Invalid alert!");
+    if (!isValidObjectId(postId)) return sendError(res, "Invalid Post!");
     if (!isValidObjectId(user._id)) return sendError(res, "Invalid user!");
-    const alert = await AlertsSchool.findById(alertId);
-    if (!alert) return sendError(res, "Alert not found!");
+    const alert = await Post.findById(postId);
+    if (!alert) return sendError(res, "Post not found!");
 
-    const school = await School.findById(alert.school);
+    const users = await User.findById(alert.owner);
 
-    if (!school) return sendError(res, "School not found!");
-    const index = school.alertsSchool.findIndex(alert => alert.toString() === alertId.toString());
+    if (!users) return sendError(res, "User not found!");
+    const index = users.post.findIndex(alert => alert.toString() === postId.toString());
     if (index === -1) return sendError(res, "Alert not found in school!");
-    school.alertsSchool.splice(index, 1);
-    await school.save();
+    users.post.splice(index, 1);
+    await users.save();
 
     if (alert.owner.toString() !== user._id.toString()) return sendError(res, "You are not authorized to delete this alert!");
     const public_id = alert.image?.public_id;

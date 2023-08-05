@@ -30,7 +30,7 @@ const movie1Router = require("./routes/movie1"); // import admin router
 
 const cors = require('cors'); // import cors (cross origin resource sharing) can also be done in the client side with proxy
 const { handleNotFound } = require('./utils/helper');
-const school = require('./models/school');
+
 
 
 const app = express();// create express app
@@ -61,7 +61,7 @@ app.use("/api/reviewsTeacher", reviewsTeacherRouter); // use review router
 app.use('/api/alertsSchool', alertsSchoolRouter);// use user router
 app.use('/api/alertsTeacher', alertsTeacherRouter);// use user router
 app.use('/api/follow', followRouter);// use user router
-app.use('/post', messagesRouter);
+app.use('/api/post', messagesRouter);
 
 
 app.use('/*', handleNotFound) // catch 404 and forward to error handler
