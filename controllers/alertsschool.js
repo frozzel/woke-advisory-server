@@ -28,7 +28,7 @@ exports.addAlertsSchool = async (req, res) => {
     
 
     if (file) {
-        const {url, public_id} = await cloudinary.uploader.upload(file.path, 
+        const {secure_url: url, public_id} = await cloudinary.uploader.upload(file.path, 
             // {
         //     transformation: {
         //         width: 1280,
