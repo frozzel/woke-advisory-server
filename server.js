@@ -93,7 +93,6 @@ io.on('connection', (socket) => {
     socket.on('roomComment', (alertId, alert) => {
       socket.join(alertId);
       console.log(`Socket ${socket.id} joined roomComment ${alertId}`);
-      console.log(alert)
       io.to(alertId).emit(`add${alertId}`, alert);
       }
       );

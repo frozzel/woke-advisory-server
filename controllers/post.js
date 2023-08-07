@@ -16,7 +16,7 @@ exports.addPostUser = async (req, res) => {
     
     const {file,  } = req;
     // const userId = req.user.id;
-
+    
     if (!isValidObjectId(userId)) return sendError(res, "Invalid user!");
 
     const user = await User.findById(userId);
@@ -47,7 +47,9 @@ exports.addPostUser = async (req, res) => {
     
     await user.save();
     await alert.save();
-    res.status(201).json({alert});
+
+    const alert2 = await Post.findById(alert._id).populate("owner", "name avatar")
+    res.status(201).json({alert: alert2});
 }
 
 exports.getPostUser = async (req, res) => {
@@ -165,5 +167,5 @@ exports.deleteAlert = async (req, res) => {
         }
     }
     await alert.remove();
-    res.status(201).json({alert});
+    res.status(201).json({"alerts": alert});
 }
