@@ -159,8 +159,8 @@ exports.deleteAlert = async (req, res) => {
     }
     await alert.remove();
 
-    const alerts = await AlertsTeacher.find({teacher: alert.teacher}).populate("owner", "name avatar").populate("comments.user", "name avatar").populate("likes.user", "name avatar").populate("teacher", "name");
+    // const alerts = await AlertsTeacher.find({teacher: alert.teacher}).populate("owner", "name avatar").populate("comments.user", "name avatar").populate("likes.user", "name avatar").populate("teacher", "name");
 
 
-    res.status(201).json({alerts});
+    res.status(201).json({"alerts": alert});
 }

@@ -160,7 +160,7 @@ exports.deleteAlert = async (req, res) => {
     }
     await alert.remove();
 
-    const alerts = await AlertsSchool.find({school: alert.school}).populate("owner", "name avatar").populate("comments.user", "name avatar").populate("likes.user", "name avatar").populate("school", "SchoolName");
+    // const alerts = await AlertsSchool.find({school: alert.school}).populate("owner", "name avatar").populate("comments.user", "name avatar").populate("likes.user", "name avatar").populate("school", "SchoolName");
     
-    res.status(201).json({alerts});
+    res.status(201).json({"alerts": alert});
 }
