@@ -169,3 +169,32 @@ exports.deleteAlert = async (req, res) => {
     await alert.remove();
     res.status(201).json({"alerts": alert});
 }
+
+exports.searchUser = async (req, res) => {
+    const { name } = req.query;
+    const { schoolId } = req.params;
+    // const result = await Actor.find({ $text: { $search: `"${query.name}"` } });
+    // if (!name.trim()) return sendError(res, "Invalid request!");
+    const result = await User.find({
+      name: { $regex: name, $options: "i" },
+    //   email: { $regex: name, $options: "i" },
+     
+    });
+  
+    // const mapTeachers = async (t) => {
+    //   const reviewsTeacher =  await getAverageRatingsTeacher(t._id);
+    //   return {
+    //     id: t._id,
+    //     name: t.name,
+    //     about: t.about,
+    //     grade: t.grade,
+    //     classType: t.classType,
+    //     avatar: t.avatar,
+    //     reviewsTeacher: {...reviewsTeacher},
+    //   };
+    // };
+    // const relatedTeachers = await Promise.all(result.map(mapTeachers));
+  
+    // const actors = result.map((actor) => formatTeacher(actor));
+    res.json({ results: result,  });
+  };
