@@ -61,7 +61,7 @@ exports.getPostUser = async (req, res) => {
     const following = [userId, ...user.following.map(user => user._id)];
     const schoolsFollowing = user.schoolsFollowing.map(school => school._id);
     const teachersFollowing = user.teachersFollowing.map(teacher => teacher._id);
-    const alerts = await Post.find({owner: following}).populate("owner", "name avatar").populate("comments.user", "name avatar").populate("likes.user", "name avatar") 
+    const alerts = await Post.find({owner: following}).populate("owner", "name avatar username").populate("comments.user", "name avatar").populate("likes.user", "name avatar") 
     const alerts2 = await AlertsSchool.find({school: schoolsFollowing}).populate("owner", "name avatar").populate("comments.user", "name avatar").populate("likes.user", "name avatar").populate("school", "SchoolName");
     const alerts3 = await AlertsTeacher.find({teacher: teachersFollowing}).populate("owner", "name avatar").populate("comments.user", "name avatar").populate("likes.user", "name avatar").populate("teacher", "name");
     const allAlerts = [...alerts, ...alerts2, ...alerts3];
@@ -69,7 +69,7 @@ exports.getPostUser = async (req, res) => {
     allAlerts.sort((a, b) => {
         return new Date(b.createdAt) - new Date(a.createdAt);
     })
-    // console.log({"alerts": allAlerts});
+    
  
     res.status(200).json({"alerts": allAlerts, following, schoolsFollowing, teachersFollowing});
 
@@ -173,11 +173,9 @@ exports.deleteAlert = async (req, res) => {
 exports.searchUser = async (req, res) => {
     const { name } = req.query;
     const { schoolId } = req.params;
-    // const result = await Actor.find({ $text: { $search: `"${query.name}"` } });
-    // if (!name.trim()) return sendError(res, "Invalid request!");
+
     const result = await User.find({
-      name: { $regex: name, $options: "i" },
-    //   email: { $regex: name, $options: "i" },
+      username: { $regex: name, $options: "i" },
      
     });
   

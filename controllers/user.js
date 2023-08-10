@@ -11,13 +11,15 @@ const cloudinary = require('../cloud');
 
 
 exports.create = async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, username } = req.body;
 
   const oldUser = await User.findOne({ email });
+  const usernameExist = await User.findOne({ username });
 
   if (oldUser) return sendError(res, "This email is already in use!");
+  if (usernameExist) return sendError(res, "This username is already in use!");
 
-  const newUser = new User({ name, email, password });
+  const newUser = new User({ name, email, password, username });
   await newUser.save();
 
   // generate 6 digit otp
@@ -52,6 +54,7 @@ exports.create = async (req, res) => {
       id: newUser._id,
       name: newUser.name,
       email: newUser.email,
+      username: newUser.username,
     },
   });
 };
@@ -246,10 +249,10 @@ exports.userInfo = async (req, res) => {
 
   if (!isValidObjectId(userId)) return sendError(res, "Invalid user!");
 
-  const user = await User.findById(userId).populate("following", "name avatar bio").populate("followers", "name avatar bio").populate("schoolsFollowing", "SchoolName AddressStreet AddressCity AddressState AddressZip").populate("teachersFollowing", "name avatar about");
+  const user = await User.findById(userId).populate("following", "name avatar bio username").populate("followers", "name avatar bio username").populate("schoolsFollowing", "SchoolName AddressStreet AddressCity AddressState AddressZip").populate("teachersFollowing", "name avatar about");
   if (!user) return sendError(res, "user not found!", 404);
 
-  res.json({user: {id: user._id, name: user.name, email: user.email, isVerified: user.isVerified, role: user.role, avatar: user.avatar?.url, bio: user.bio, schoolsFollowing: user.schoolsFollowing, teachersFollowing: user.teachersFollowing, following: user.following, followers: user.followers}})
+  res.json({user: {id: user._id, name: user.name, email: user.email, username: user.username, isVerified: user.isVerified, role: user.role, avatar: user.avatar?.url, bio: user.bio, schoolsFollowing: user.schoolsFollowing, teachersFollowing: user.teachersFollowing, following: user.following, followers: user.followers}})
 }
 
 exports.updateUser = async (req, res) => {
